@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianmi.pc.dao.g2d.item.G2dProductChangeMapper">
+
+    <!--批量插入 of583-->
+    <insert id="addByProductIds">
+        INSERT INTO pc_g2d_product_change
+        (product_id, parent_product_id, cmid, parent_cmid, product_name, product_bn, brand_name, img, product_add_time, product_category, reason)
+        <foreach collection="products" item="product" index="index" separator="UNION ALL">
+            SELECT #{product.productId} productId, #{product.parentProductId} parentProductId, #{product.chainMasterId} chainMasterId,
+            #{product.parentCmid} parentChainMasterId,
+            (select product_name from pc_product_ext a where a.product_id = #{product.productId}) productName,
+            (select bn from qm_product where product_id = (select std_product_id from pc_product_ext where product_id = #{product.productId})) productBn,
+            (select bname from qm_product where product_id = (select std_product_id from pc_product_ext where product_id = #{product.productId})) brandName,
+            (select img from qm_item_img where item_id = #{product.productId} and iorder = 0) img,
+            (select add_time from pc_product_ext where product_id = #{product.productId}) productAddTime,
+            #{product.productCategory} productCategory,#{product.reason} reason
+            FROM dual
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qianmi.admin.dao.order.TradeCollectMapper">
+
+    <resultMap id="task4run" type="com.qianmi.admin.pojo.order.TradeCollectTask">
+        <result property="taskId" column="task_id" />
+        <result property="userCode" column="user_code" />
+        <result property="triggerTime" column="trigger_time" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <resultMap id="task4result" type="com.qianmi.admin.pojo.order.TradeCollectTask">
+        <result property="triggerTime" column="trigger_time" />
+        <result property="status" column="status" />
+        <result property="fileName" column="file_name" />
+        <result property="filePath" column="file_path" />
+        <result property="errMsg" column="err_msg"/>
+    </resultMap>
+
+    <!--查询单个用户 订单自动汇总配置-->
+    <select id="selectTradeCollectConfig" parameterType="String"
+            resultType="com.qianmi.admin.pojo.order.TradeCollectConfig">
+        select user_code as userCode,open_flag as openFlag,time1,time2,time3,time4 from QM_TRADE_AUTO_COLLECT_CONFIG
+        where user_code=#{userCode}
+    </select>
+    <!--查询所有用户 订单自动汇总配置-->
+    <select id="selectAllTradeCollectConfig" parameterType="String"
+            resultType="com.qianmi.admin.pojo.order.TradeCollectConfig">
+        select user_code as userCode,open_flag as openFlag,time1,time2,time3,time4 from QM_TRADE_AUTO_COLLECT_CONFIG
+        where open_flag=1
+    </select>
+    <!--更新用户订单自动汇总配置-->
+    <update id="updateTradeConfig" parameterType="com.qianmi.admin.pojo.order.TradeCollectConfig">
+        update QM_TRADE_AUTO_COLLECT_CONFIG set open_flag=#{openFlag},
+        <if test="time1 != null">time1=#{time1},</if>
+        <if test="time2 != null">time2=#{time2},</if>
+        <if test="time3 != null">time3=#{time3},</if>
+        <if test="time4 != null">time4=#{time4}</if>
+        where user_code=#{userCode}
+    </update>
+    <!--新增用户 订单自动汇总配置-->
+    <insert id="addNewConfig" parameterType="com.qianmi.admin.pojo.order.TradeCollectConfig">
+        insert into QM_TRADE_AUTO_COLLECT_CONFIG (
+        user_code,open_flag,time1,time2,time3,time4)
+        values(
+        #{userCode},#{openFlag},
+        <choose>
+            <when test="time1 != null">#{time1},</when>
+            <otherwise>null,</otherwise>
+        </choose>
+        <choose>
+            <when test="time2 != null">#{time2},</when>
+            <otherwise>null,</otherwise>
+        </choose>
+        <choose>
+            <when test="time3 != null">#{time3},</when>
+            <otherwise>null,</otherwise>
+        </choose>
+        <choose>
+            <when test="time4 != null">#{time4}</when>
+            <otherwise>null</otherwise>
+        </choose>
+        )
+    </insert>
+
+    <!--新增 订单自动汇总异步任务-->
+    <insert id="addTradeCollectTaskBatch" parameterType="map">
+        insert into QM_TRADE_COLLECT_TASK (TASK_ID,USER_CODE,TRIGGER_TIME,STATUS)
+        (
+        <foreach collection="list" item="task" index="index" separator="union all">
+            select #{task.taskId}, #{task.userCode}, to_date(#{task.triggerTime}, 'yyyy-mm-dd hh24:mi:ss'),#{task.status} from dual
+        </foreach>
+        )
+    </insert>
+    <!--查询待运行的任务-->
+   <select id="selectTasksForRun" resultMap="task4run">
+       select * from(select task_id as taskId, user_code as userCode,to_char(trigger_time,'yyyy-mm-dd hh24:mi:ss') as triggerTime, status
+       from QM_TRADE_COLLECT_TASK where status='10C' order by trigger_time )
+       <![CDATA[
+       where rownum<5
+        ]]>
+   </select>
+
+    <!--设置的任务运行状态-->
+    <update id="updateTaskRun" parameterType="String">
+        update QM_TRADE_COLLECT_TASK
+        <set>
+            status='10A',run_time=sysdate
+        </set>
+        where task_id=#{taskId} and status='10C'
+    </update>
+    <!--设置任务完成结果-->
+    <update id="updateTask" parameterType="com.qianmi.admin.pojo.order.TradeCollectTask">
+        update QM_TRADE_COLLECT_TASK
+        <set>
+            status=#{status},done_time=sysdate,
+            <if test="fileName !=null ">file_name=#{fileName},</if>
+            <if test="filePath !=null ">file_path=#{filePath},</if>
+            <if test="errMsg !=null ">err_msg=#{errMsg}</if>
+        </set>
+        where task_id=#{taskId}
+    </update>
+    <!--删除一周之前的任务-->
+    <delete id="deleteTaskWithAWeekAgo">
+         <![CDATA[
+         delete from QM_TRADE_COLLECT_TASK where trigger_time < sysdate-7
+        ]]>
+    </delete>
+    <!--查询订单汇总结果-->
+    <select id="selectTradCollectResult" parameterType="com.qianmi.admin.pojo.order.TradeCollectTask" resultMap="task4result">
+         select to_char(trigger_time,'yyyy-mm-dd hh24:mi:ss') as trigger_time,status,file_name,file_path,err_msg from QM_TRADE_COLLECT_TASK
+         where user_code=#{userCode}
+         <![CDATA[
+             and trigger_time >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+             and trigger_time <= to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss')
+             ]]>
+    </select>
+
+   <!--加锁-->
+    <update id="updateAsyncTaskLock" parameterType="java.lang.String">
+        update jxc_async_task_lock set status='10A',modify_time=sysdate where name=#{name} and status='10C'
+    </update>
+    <!--释放锁-->
+    <update id="updateAsyncTaskUnLock" parameterType="java.lang.String">
+        update jxc_async_task_lock set status='10C',modify_time=sysdate where name=#{name}
+    </update>
+
+</mapper>

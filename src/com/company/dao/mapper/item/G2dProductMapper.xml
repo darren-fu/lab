@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianmi.pc.dao.g2d.item.G2dProductMapper">
+
+    <!-- 查询商品附属信息 of837_jh -->
+    <select id="getProductExtByProductId" resultType="com.qianmi.pc.api.item.pojo.ProductAffiliated">
+        SELECT
+        t.product_id productId,
+        t.std_product_id standardProductId,
+        t.cmid chainMasterId,
+        t.product_name productName,
+        t.del_flag deleteFlag,
+        t.from_sys fromSys,
+        t.par_pid parentProductId,
+        t.status status,
+        t.is_custom isCustom,
+        t.price price,
+        t.stock stock,
+        t.weight weight,
+        TO_CHAR(t.uptime, 'yyyy-mm-dd hh24:mi:ss') upTime,
+        TO_CHAR(t.downtime, 'yyyy-mm-dd hh24:mi:ss') downTime
+        FROM pc_product_ext t
+        WHERE
+        <!--如果未开通店铺chainMasterId为空-->
+        <if test="null != chainMasterId and '' != chainMasterId">
+            t.cmid = #{chainMasterId} AND
+        </if>
+        t.product_id = #{productId}
+        AND t.del_flag = 0
+    </select>
+
+    <select id="getProductInfoByProductId" resultType="com.qianmi.pc.api.item.pojo.ProductAffiliated">
+        SELECT
+        t.product_id productId,
+        t.std_product_id standardProductId,
+        t.cmid chainMasterId,
+        t.product_name productName,
+        t.del_flag deleteFlag,
+        t.from_sys fromSys,
+        t.par_pid parentProductId,
+        t.status status,
+        t.is_custom isCustom,
+        t.price price,
+        t.stock stock,
+        TO_CHAR(t.uptime, 'yyyy-mm-dd hh24:mi:ss') upTime,
+        TO_CHAR(t.downtime, 'yyyy-mm-dd hh24:mi:ss') downTime,
+        l.set_price_mode priceMode
+        FROM pc_product_ext t,pc_product_line l
+        WHERE
+        <!--如果未开通店铺chainMasterId为空-->
+        <if test="null != chainMasterId and '' != chainMasterId">
+            t.cmid = #{chainMasterId}
+        </if>
+        AND t.product_id = l.product_id and l.line = 2 and t.product_id = #{productId}
+        AND t.del_flag = 0
+    </select>
+
+    <!-- 获取商品信息 -->
+    <select id="getById" resultType="com.qianmi.pc.api.item.pojo.Product">
+        SELECT product_id id,
+        cmid chainMasterId,
+        pname name,
+        cid catId,
+        typeid typeId,
+        bid brandId,
+        bname brandName,
+        unit,
+        bn,
+        img image,
+        cost,
+        price,
+        mktprice mktPrice,
+        stock,
+        weight,
+        marketable,
+        stockWarn,
+        btid buyTemplateId,
+        use_spec useSpec,
+        disabled,
+        buy_count buyCount,
+        catflag catFlag,
+        stid,
+        version,
+        TO_CHAR(addtime, 'yyyy-mm-dd hh24:mi:ss') addTime,
+        TO_CHAR(updtime, 'yyyy-mm-dd hh24:mi:ss') updateTime,
+        TO_CHAR(uptime, 'yyyy-mm-dd hh24:mi:ss') upTime,
+        TO_CHAR(downtime, 'yyyy-mm-dd hh24:mi:ss') downTime,
+        from_sys fromSys,
+        from_id fromId,
+        p_1 p1,
+        p_2 p2,
+        p_3 p3,
+        p_4 p4,
+        p_5 p5,
+        p_6 p6,
+        p_7 p7,
+        p_8 p8,
+        p_9 p9,
+        p_10 p10,
+        p_11 p11,
+        p_12 p12,
+        p_13 p13,
+        p_14 p14,
+        p_15 p15,
+        p_16 p16,
+        p_17 p17,
+        p_18 p18,
+        p_19 p19,
+        p_20 p20,
+        p_21 p21,
+        p_22 p22,
+        p_23 p23,
+        p_24 p24,
+        p_25 p25,
+        is_custom isCustom
+        FROM qm_product
+        where
+        <if test="null != chainMasterId and '' !=  chainMasterId">
+            (cmid = #{chainMasterId} or cmid = 'A000000') and
+        </if>
+        product_id = #{id}
+    </select>
+
+    <!-- 生成商品附属信息表商品编号 of837_jh-->
+    <select id="getExtId" resultType="String" flushCache="true">
+        SELECT pc_product_ext_seq.NEXTVAL FROM dual
+    </select>
+
+    <select id="queryProductExtsCount" parameterType="java.util.Map" resultType="int">
+        select count(1) from (<include refid="productExt_sql"/>)
+    </select>
+
+    <select id="queryProductExts" parameterType="java.util.Map"
+            resultType="com.qianmi.pc.api.item.pojo.PcProductExt">
+        SELECT * FROM (
+        SELECT t.*, rownum rownum_ FROM (
+        <include refid="productExt_sql"/>
+        <choose>
+            <when test="null != sortEntries and sortEntries.size() > 0 and product.delFlag !=1">
+                ORDER BY
+                <foreach collection="sortEntries" item="entry" separator=",">
+                    <choose>
+                        <when test="entry.field == 'name'">
+                            p.pname
+                        </when>
+                        <when test="entry.field == 'bn'">
+                            p.bn
+                        </when>
+                        <when test="entry.field == 'stock'">
+                            e.stock
+                        </when>
+                        <when test="entry.field == 'catId'">
+                            p.cid
+                        </when>
+                        <when test="entry.field == 'typeId'">
+                            p.typeid
+                        </when>
+                        <when test="entry.field == 'brandId'">
+                            p.bid
+                        </when>
+                    </choose>
+                    <choose>
+                        <when test="entry.model.value == 1">
+                            DESC nulls last
+                        </when>
+                        <otherwise>
+                            ASC nulls last
+                        </otherwise>
+                    </choose>
+                </foreach>
+                ,e.modify_time DESC,p.product_id DESC
+            </when>
+            <otherwise>
+                ORDER BY e.modify_time DESC,e.product_id DESC
+            </otherwise>
+        </choose>
+        ) t WHERE rownum &lt;= #{end}
+        ) WHERE rownum_ > #{start}
+    </select>
+
+    <!--我的商品列表SQL-->
+    <sql id="productExt_sql">
+        SELECT
+        e.product_id id,
+        e.std_product_id stdId,
+        e.product_name name,
+        decode(e.ADD_TIME,null,'',TO_CHAR(e.ADD_TIME, 'yyyy-mm-dd hh24:mi:ss')) addTime,
+        decode(e.MODIFY_TIME,null,'',TO_CHAR(e.MODIFY_TIME, 'yyyy-mm-dd hh24:mi:ss')) updateTime,
+        decode(e.UPTIME,null,'',TO_CHAR(e.UPTIME, 'yyyy-mm-dd hh24:mi:ss')) upTime,
+        decode(e.DOWNTIME,null,'',TO_CHAR(e.DOWNTIME, 'yyyy-mm-dd hh24:mi:ss')) downTime,
+        e.from_sys fromSys,
+        l.status status,
+        e.STOCKWARN stockWarn,
+        p.bn sn,
+        p.img image,
+        p.bid brandId,
+        p.bname brandName,
+        p.stid,
+        p.typeid typeId,
+        p.cid itemCateId,
+        e.stock stock,
+        e.part_up partUp,
+        e.is_custom isCustom,
+        p.unit unit
+        FROM qm_product p,pc_product_ext e
+        <choose>
+            <!--展示目录-->
+            <when test="product.catId != null and product.catId != ''">
+                inner join (select distinct product_id from qm_cat_product_relation where cid like #{product.catId}||'%'
+                and cmid = #{ownerId}) rel on rel.product_id = e.product_id
+            </when>
+
+        </choose>
+
+        left join (select PRODUCT_ID,line,status,part_up,pl.del_flag del_flag from PC_PRODUCT_LINE pl where pl.cmid=
+        #{ownerId} and pl.line = #{line}
+        and pl.del_flag = 0) l on l.PRODUCT_ID = e.PRODUCT_ID
+        where
+        p.product_id = e.std_product_id
+
+        AND e.cmid = #{product.chainMasterId}
+        <!--商品编号-->
+        <if test="product.id != null and product.id != '' ">
+            AND lower(e.product_id) like lower('%'||#{product.id}||'%')
+        </if>
+        <!--商品名称-->
+        <if test="product.name != null and product.name != '' ">
+            AND lower(e.product_name) like lower('%'||#{product.name}||'%')
+        </if>
+
+        <!--商品类型-->
+        <if test="product.typeId != null and product.typeId != '' ">
+            AND P.typeid = #{product.typeId}
+        </if>
+
+        <!--品牌-->
+        <if test="product.brandId != null and product.brandId != '' ">
+            AND p.bid = #{product.brandId}
+        </if>
+
+        <!--SPU 货号-->
+        <if test="product.sn != null and product.sn != '' ">
+            AND p.bn like '%'||#{product.sn,jdbcType=VARCHAR}||'%'
+        </if>
+
+        <!--品牌-->
+        <choose>
+            <when test="product.brandId != null and product.brandId gt 0">
+                AND p.bid = #{product.brandId}
+            </when>
+            <when test="product.brandId != null and product.brandId lt 1">
+                AND p.bid is null
+            </when>
+        </choose>
+
+        <!--0：正常 ,1：逻辑删除, 2:物理删除-->
+        <if test="product.delFlag != null">
+            AND l.del_flag = #{product.delFlag}
+        </if>
+
+        <if test="null != statusList and statusList.size() > 0">
+            AND l.status IN
+            <foreach item="states" index="index" collection="statusList" open="("
+                     separator="," close=")">
+                #{states}
+            </foreach>
+        </if>
+        <if test="null == statusList or statusList.size() == 0">
+            and (l.status is null or l.del_flag != 0)
+        </if>
+        <!--ststus:0、未审核 1、审核不通过 2、下架 3、上架 4、锁定-->
+        <!--partUp:0、非部分上架 1、部分上架-->
+        <choose>
+            <when test="product.status != null and product.partUp == null and line != null">
+                AND l.status = #{product.status}
+            </when>
+            <when test="product.status !=null and product.status==3 and product.partUp == 1 and line != null">
+                and l.status= #{product.status} and l.part_up = #{product.partUp}
+            </when>
+            <when test="product.status !=null and product.status==3 and product.partUp == 0 and line != null">
+                and l.status= #{product.status} and (l.part_up is null or l.part_up = #{product.partUp} )
+            </when>
+        </choose>
+
+        <!--0 正常 ,1 警报-->
+        <if test="product.stockWarn != null">
+            AND e.stockWarn = #{product.stockWarn}
+        </if>
+
+        <!--0 正常 ,1 警报-->
+        <if test="stdStatus != null">
+            AND e.status = #{stdStatus}
+        </if>
+
+        <if test="product != null and product.fromSys != null">
+            and e.from_sys = #{product.fromSys}
+        </if>
+
+        <!--关键词-->
+        <if test="null != ids and ids.size() > 0">
+            AND e.product_id IN
+            <foreach item="id" index="index" collection="ids" open="("
+                     separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        <!--SKU货品编号-->
+        <if test="product.bn != null and product.bn != ''">
+            AND exists
+            (
+            select 1 from qm_goods g where g.bn = #{product.bn} and g.product_id = e.PRODUCT_ID
+            )
+        </if>
+
+        <!--SKU条形码-->
+        <if test="product.barCode != null and product.barCode != ''">
+            AND exists
+            (
+            select 1 from qm_goods g where g.goods_barcode = #{product.barCode} and g.product_id = e.PRODUCT_ID
+            )
+        </if>
+
+    </sql>
+
+
+    <select id="queryG2dProductExtsCount" parameterType="java.util.Map" resultType="int">
+        select count(1) from (<include refid="gedProductExt_sql"/>)
+    </select>
+
+    <select id="queryG2dProductExts" parameterType="java.util.Map"
+            resultType="com.qianmi.pc.api.item.pojo.PcProductExt">
+        SELECT * FROM (
+        SELECT t.*, rownum rownum_ FROM (
+        <include refid="gedProductExt_sql"/>
+        <choose>
+            <when test="null != sortEntries and sortEntries.size() > 0 and product.delFlag !=1">
+                ORDER BY
+                <foreach collection="sortEntries" item="entry" separator=",">
+                    <choose>
+                        <when test="entry.field == 'name'">
+                            p.pname
+                        </when>
+                        <when test="entry.field == 'bn'">
+                            p.bn
+                        </when>
+                        <when test="entry.field == 'stock'">
+                            e.stock
+                        </when>
+                        <when test="entry.field == 'catId'">
+                            p.cid
+                        </when>
+                        <when test="entry.field == 'typeId'">
+                            p.typeid
+                        </when>
+                        <when test="entry.field == 'brandId'">
+                            p.bid
+                        </when>
+                    </choose>
+                    <choose>
+                        <when test="entry.model.value == 1">
+                            DESC nulls last
+                        </when>
+                        <otherwise>
+                            ASC nulls last
+                        </otherwise>
+                    </choose>
+                </foreach>
+                ,e.modify_time DESC,p.product_id DESC
+            </when>
+            <otherwise>
+                ORDER BY e.modify_time DESC,e.product_id DESC
+            </otherwise>
+        </choose>
+        ) t WHERE rownum &lt;= #{end}
+        ) WHERE rownum_ > #{start}
+    </select>
+
+    <!--我的商品列表SQL-->
+    <sql id="gedProductExt_sql">
+        SELECT
+        e.product_id id,
+        e.cmid chainMasterId,
+        e.std_product_id stdId,
+        e.product_name name,
+        decode(e.ADD_TIME,null,'',TO_CHAR(e.ADD_TIME, 'yyyy-mm-dd hh24:mi:ss')) addTime,
+        decode(e.MODIFY_TIME,null,'',TO_CHAR(e.MODIFY_TIME, 'yyyy-mm-dd hh24:mi:ss')) updateTime,
+        decode(e.UPTIME,null,'',TO_CHAR(e.UPTIME, 'yyyy-mm-dd hh24:mi:ss')) upTime,
+        decode(e.DOWNTIME,null,'',TO_CHAR(e.DOWNTIME, 'yyyy-mm-dd hh24:mi:ss')) downTime,
+        e.from_sys fromSys,
+        l.status status,
+        e.STOCKWARN stockWarn,
+        p.bn sn,
+        p.img image,
+        p.bid brandId,
+        p.bname brandName,
+        p.stid,
+        p.typeid typeId,
+        p.cid itemCateId,
+        e.stock stock,
+        e.part_up partUp,
+        e.is_custom isCustom,
+        p.markeTable,
+        p.unit unit
+        FROM qm_product p,pc_product_ext e
+        <choose>
+            <!--展示目录-->
+            <when test="product.catId != null and product.catId != ''">
+                inner join (select distinct product_id from qm_cat_product_relation where cid like #{product.catId}||'%'
+                and cmid = #{ownerId}) rel on rel.product_id = e.product_id
+            </when>
+
+        </choose>
+
+        left join (select PRODUCT_ID,line,status,part_up,pl.del_flag del_flag from PC_PRODUCT_LINE pl where pl.cmid= #{ownerId} and pl.line = #{line}
+        and pl.del_flag = 0) l on l.PRODUCT_ID = e.PRODUCT_ID
+        where
+        p.product_id = e.std_product_id
+        and e.from_owner=2
+
+        <!--商品编号-->
+        <if test="product.chainMasterId != null and product.chainMasterId != '' ">
+            AND e.cmid = #{product.chainMasterId}
+        </if>
+        <!--商品编号-->
+        <if test="product.id != null and product.id != '' ">
+            AND lower(e.product_id) like lower('%'||#{product.id}||'%')
+        </if>
+        <!--商品名称-->
+        <if test="product.name != null and product.name != '' ">
+            AND lower(e.product_name) like lower('%'||#{product.name}||'%')
+        </if>
+
+        <!--商品类型-->
+        <if test="product.typeId != null and product.typeId != '' ">
+            AND P.typeid = #{product.typeId}
+        </if>
+
+        <!--品牌-->
+        <if test="product.brandId != null and product.brandId != '' ">
+            AND p.bid = #{product.brandId}
+        </if>
+
+        <!--SPU 货号-->
+        <if test="product.sn != null and product.sn != '' ">
+            AND p.bn like '%'||#{product.sn,jdbcType=VARCHAR}||'%'
+        </if>
+
+        <!--品牌-->
+        <choose>
+            <when test="product.brandId != null and product.brandId gt 0">
+                AND p.bid = #{product.brandId}
+            </when>
+            <when test="product.brandId != null and product.brandId lt 1">
+                AND p.bid is null
+            </when>
+        </choose>
+
+        <!--0：正常 ,1：逻辑删除, 2:物理删除-->
+        <if test="product.delFlag != null">
+            AND e.del_flag = #{product.delFlag}
+        </if>
+
+        <if test="null != statusList and statusList.size() > 0">
+            AND l.status IN
+            <foreach item="states" index="index" collection="statusList" open="("
+                     separator="," close=")">
+                #{states}
+            </foreach>
+        </if>
+        <if test="null == statusList or statusList.size() == 0">
+            and (l.status is null or l.del_flag != 0)
+        </if>
+        <!--ststus:0、未审核 1、审核不通过 2、下架 3、上架 4、锁定-->
+        <!--partUp:0、非部分上架 1、部分上架-->
+        <choose>
+            <when test="product.status != null and product.partUp == null and line != null">
+                AND l.status = #{product.status}
+            </when>
+            <when test="product.status !=null and product.status==3 and product.partUp == 1 and line != null">
+                and l.status= #{product.status} and l.part_up = #{product.partUp}
+            </when>
+            <when test="product.status !=null and product.status==3 and product.partUp == 0 and line != null">
+                and l.status= #{product.status} and (l.part_up is null or l.part_up = #{product.partUp} )
+            </when>
+        </choose>
+
+        <!--0 正常 ,1 警报-->
+        <if test="product.stockWarn != null">
+            AND e.stockWarn = #{product.stockWarn}
+        </if>
+
+        <!--0 正常 ,1 警报-->
+        <if test="stdStatus != null">
+            AND e.status = #{stdStatus}
+        </if>
+
+        <if test="product != null and product.fromSys != null">
+            and e.from_sys = #{product.fromSys}
+        </if>
+
+        <!--关键词-->
+        <if test="null != ids and ids.size() > 0">
+            AND e.product_id IN
+            <foreach item="id" index="index" collection="ids" open="("
+                     separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        <!--SKU货品编号-->
+        <if test="product.bn != null and product.bn != ''">
+            AND exists
+            (
+            select 1 from qm_goods g where g.bn = #{product.bn} and g.product_id = e.PRODUCT_ID
+            )
+        </if>
+
+        <!--SKU条形码-->
+        <if test="product.barCode != null and product.barCode != ''">
+            AND exists
+            (
+            select 1 from qm_goods g where g.goods_barcode = #{product.barCode} and g.product_id = e.PRODUCT_ID
+            )
+        </if>
+
+    </sql>
+
+    <!-- 查询商品的起批区间 of583 -->
+    <select id="listProductPriceArea" resultType="com.qianmi.pc.api.sup.pojo.ProductPriceArea">
+        select ID id,
+        CMID chainMasterId,
+        PRODUCT_ID productId,
+        GOODS_NUM goodsNum,
+        GOODS_PRICE price
+        from pc_product_price_area where cmid=#{chainMasterId} and product_id=#{productId}
+        order by goods_num asc
+    </select>
+
+    <!-- 查询商品总数-->
+    <select id="countProduct" resultType="java.lang.Integer">
+        select count(a.product_id) from pc_product_ext a, pc_product_line b where a.cmid = #{chainMasterId} and a.product_id = b.product_id
+         and a.del_flag =0 and b.del_flag = 0 and b.status in (2,3)
+    </select>
+    <!-- 查询上架商品总数-->
+    <select id="countMarketableProduct" resultType="java.lang.Integer">
+        select count(a.product_id) from pc_product_ext a, pc_product_line b
+         where a.product_id = b.product_id and a.cmid = #{chainMasterId} and a.del_flag = 0 and b.status = 3 and b.del_flag = 0
+    </select>
+
+
+
+    <select id="queryProductExtsByCmIdCount" parameterType="java.util.Map" resultType="int">
+        select count(1) from (<include refid="queryProductExtsByCmId_sql"/> )
+    </select>
+    <!-- xiaog获取对应D的商品 -->
+    <select id="queryProductExtsByCmId" parameterType="java.util.Map" resultType="com.qianmi.pc.api.g2d.item.response.G2dProductQueryByCmIdResponse">
+
+        select * from (select x.*, rownum xrownum from (
+        <include refid="queryProductExtsByCmId_sql"/>
+
+        ORDER BY t.modify_time DESC,t.product_id DESC
+        ) x where 1=1
+        <if test="end != null and end != ''">
+            <![CDATA[and rownum <= #{end}  ]]>
+        </if>
+        )
+        <if test="start != null and start != ''">
+            <![CDATA[ where xrownum > #{start} ]]>
+        </if>
+    </select>
+
+    <sql id="queryProductExtsByCmId_sql">
+
+        SELECT rownum AS rn,
+        t.CMID AS chainMasterId,
+        t.PRODUCT_ID AS ID,
+        t.STD_PRODUCT_ID AS stdId,
+        t.PRODUCT_NAME AS name,
+        t0.IMG AS image,
+
+        t.MODIFY_TIME AS updateTime,
+        t.DEL_FLAG    AS delFlag,
+        t.STATUS      AS status
+
+        <if test="ownId != null and ownId != ''">
+             ,(
+            CASE
+            WHEN t4.ID IS  NULL
+            THEN 0
+            ELSE 1 end) AS hasAdded
+
+        </if>
+        FROM QM_PRODUCT t0,pc_product_ext t
+        JOIN QM_CAT_PRODUCT_RELATION t3 ON t3.CMID=#{chainMasterId}
+         AND t3.PRODUCT_ID=t.PRODUCT_ID AND t3.DISPLAY_SITE=0
+        <if test="catId != null and catId != ''">
+            AND t3.CID in(select t1.cid FROM PC_CAT_COMMISSION t1,(select cid from qm_product_cat c
+            where  c.display_site='0' and c.cid like CONCAT(#{catId},'%') and c.cmid=#{chainMasterId})t2 where coop_cmid=#{ownId} and t1.cid=t2.cid)
+        </if>
+        <if test="catId == null or catId == ''">
+            AND t3.CID in(select t1.cid FROM PC_CAT_COMMISSION t1,(select cid from qm_product_cat c
+            where  c.display_site='0' and c.cmid=#{chainMasterId})t2 where coop_cmid=#{ownId} and t1.cid=t2.cid)
+        </if>
+        <if test="ownId != null and ownId != ''">
+        LEFT JOIN pc_product_relation t4 ON t4.PARENT_PRODUCT_ID = t.PRODUCT_ID AND t4.PARENT_CMID = #{chainMasterId}
+            And t4.CMID=#{ownId}
+        </if>
+
+        WHERE NOT EXISTS
+        (SELECT 1
+        FROM QM_GOODS t2
+        WHERE t2.PRODUCT_ID = t.PRODUCT_ID
+        AND t2.PROXY        = #{proxy}
+        AND t2.CMID         = #{chainMasterId}
+        )
+        <if test="name != null and name != ''">
+            AND lower(t.PRODUCT_NAME) like lower('%'||#{name}||'%')
+        </if>
+        AND t.STD_PRODUCT_ID=t0.PRODUCT_ID
+        AND t0.DEL_FLAG=0
+        <if test="brandId != null and brandId != ''">
+            AND t0.BID = #{brandId}
+        </if>
+        AND t0.BID in(select bid from PC_BRAND_RELATION where rel_cmid=#{ownId})
+        AND t.DEL_FLAG=0
+        AND t.CMID=#{chainMasterId}
+
+    </sql>
+
+
+    <!-- 批量删除价格区间 of837_jh -->
+    <update id="deleteProductPriceAreaList">
+        delete from pc_product_price_area where cmid=#{chainMasterId} and product_id=#{productId}
+    </update>
+
+    <!--批量插入商品价格区间 of342_WuDangPeng-->
+    <insert id="addProductPriceAreaList">
+        INSERT INTO pc_product_price_area (
+        ID,
+        CMID,
+        PRODUCT_ID,
+        GOODS_NUM,
+        GOODS_PRICE
+        )
+        SELECT pc_price_area_seq.nextval, a.* FROM (
+        <foreach collection="productPriceAreaList" item="productPriceArea" index="index" separator="union all" >
+            (SELECT
+            #{productPriceArea.chainMasterId, jdbcType=VARCHAR},
+            #{productPriceArea.productId, jdbcType=VARCHAR},
+            #{productPriceArea.goodsNum, jdbcType=VARCHAR},
+            #{productPriceArea.price, jdbcType=VARCHAR}
+            FROM dual)
+        </foreach>) a
+    </insert>
+
+    <!-- 修改商品产品线关系 -->
+    <update id="editPSetPriceMode" parameterType="com.qianmi.pc.api.pojo.ext.item.ProductLine">
+        update pc_product_line set set_price_mode = #{productLine.setPriceMode}
+        where cmid = #{productLine.chainMasterId}
+        and line = 2
+        and product_id = #{productLine.productId}
+        and del_flag = 0
+    </update>
+
+
+    <!-- 回收站 查询 line 表的DEL_FLAG字段是1或者3的数据，3是强制下市-->
+    <sql id="product_recycled_sql">
+        SELECT
+        rownum rownumber,
+        e.PRODUCT_NAME productName,
+        e.IS_CUSTOM isCustom,
+        p.img img,
+        l.DEL_FLAG delFlag,
+        P.BN bn,
+        decode(e.ADD_TIME,null,'',TO_CHAR(e.ADD_TIME, 'yyyy-mm-dd hh24:mi:ss')) addtime,
+        decode(e.DOWNTIME,null,'',TO_CHAR(e.DOWNTIME, 'yyyy-mm-dd hh24:mi:ss')) downtime,
+        l.product_id productId,
+        B.BNAME brandName,
+        l.reason
+
+        FROM qm_product p,pc_product_ext e, pc_product_line l,  QM_BRAND b
+
+        WHERE p.product_id = e.std_product_id
+        AND e.product_id = l.product_id
+        AND b.BID(+) = p.BID
+
+        <!--商品编号-->
+        <if test="bn != null and bn != '' ">
+            AND p.bn like  '%${bn}%'
+        </if>
+        <!--商品名称-->
+        <if test="productName != null and productName != '' ">
+            AND e.product_name  like  '%${productName}%'
+        </if>
+
+
+        AND l.line = 2
+        AND e.CMID=#{cmid}
+        AND l.DEL_FLAG in (1,3)
+        order by e.DOWNTIME desc
+
+    </sql>
+
+
+    <select id="queryG2dRecycledProduct" parameterType="java.util.Map"
+            resultType="com.qianmi.pc.api.g2d.pojo.G2dProduct">
+        SELECT x.* FROM (SELECT t.*, rownum xrownum FROM (
+        <include refid="product_recycled_sql"/>
+        ) t WHERE rownum &lt;= #{end}) x  WHERE  xrownum > #{start}
+    </select>
+
+
+    <select id="queryRecycledProductTotalCount" parameterType="java.util.Map" resultType="int">
+        select count(1) from (<include refid="product_recycled_sql"/>)
+    </select>
+
+    <select id="listProductIdsByChainMasterId" resultType="java.lang.String">
+    select a.product_id from pc_product_ext a, PC_PRODUCT_LINE t2
+        WHERE A.PRODUCT_ID = t2.PRODUCT_ID
+        AND A.cmid         = #{chainMasterId}
+        AND t2.status   = 3
+        AND A.del_flag = 0
+
+    </select>
+
+    <select id="listExistsIdsByChainMasterId" resultType="java.lang.String">
+        select a.product_id from pc_product_ext a, PC_PRODUCT_LINE t2
+        WHERE A.PRODUCT_ID = t2.PRODUCT_ID
+        AND A.cmid         = #{chainMasterId}
+        AND t2.del_flag = 0
+        AND A.del_flag = 0
+    </select>
+
+    <!-- 回收站删除商品 -->
+    <delete id="deleteG2dRecycledProduct">
+        delete FROM pc_product_line where cmid = #{chainMasterId} and LINE=2 AND PRODUCT_ID in
+        <foreach collection="productIdList" item="productId" separator="," open="(" close=")" index="i">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <!-- 回收站删除商品 -->
+    <delete id="deleteG2dRecycledGoods">
+        delete FROM pc_goods_line where cmid = #{chainMasterId} and LINE=2 AND PRODUCT_ID in
+        <foreach collection="productIdList" item="productId" separator="," open="(" close=")" index="i">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <!-- 回收站删除商品的新表关系 -->
+    <delete id="deleteG2dRecycledProductRelation">
+        delete FROM pc_product_relation where cmid = #{chainMasterId} and PRODUCT_ID in
+        <foreach collection="productIdList" item="productId" separator="," open="(" close=")" index="i">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <!-- 回收站已作废删除商品 -->
+    <delete id="deleteG2dRecycledInvalidProduct">
+        delete FROM pc_g2d_product_change where cmid = #{chainMasterId} and PRODUCT_ID in
+        <foreach collection="productIdList" item="productId" separator="," open="(" close=")" index="i">
+            #{productId}
+        </foreach>
+    </delete>
+
+
+    <!-- 回收站重新上架商品 -->
+    <update id="recycleRecover">
+        update pc_product_line pld set DEL_FLAG = 0, status = 0
+        where cmid = #{chainMasterId} and LINE=2 AND  PRODUCT_ID = #{productId}
+    </update>
+
+    <!-- 回收站重新上架商品 -->
+    <update id="recycleRecoverGoods">
+        update pc_goods_line pld set DEL_FLAG = 0, status = 0
+        where cmid = #{chainMasterId} and LINE=2 AND PRODUCT_ID = #{productId}
+    </update>
+
+    <update id="updateG2dProductShopStatus" parameterType="java.util.Map">
+        update PC_PRODUCT_EXT t set t.SHOP_STATUS=#{shop_status} where t.CMID = #{cmid}
+    </update>
+
+
+    <!-- 回收站 查询 line 表的DEL_FLAG字段是1或者3的数据，3是强制下市-->
+    <sql id="product_recycled_invalid_sql">
+        SELECT
+        rownum rownumber,
+        PRODUCT_ID productId,
+        PARENT_PRODUCT_ID parentProductId,
+        CMID cmid,
+        PARENT_CMID parentCmid,
+        PRODUCT_NAME productName,
+        PRODUCT_BN productBn,
+        BRAND_NAME brandName,
+        PRODUCT_CATEGORY productCategory,
+        REASON reason,
+        IMG img,
+        decode(PRODUCT_ADD_TIME,null,'',TO_CHAR(PRODUCT_ADD_TIME, 'yyyy-mm-dd hh24:mi:ss')) productAddtime,
+        decode(ADD_TIME,null,'',TO_CHAR(ADD_TIME, 'yyyy-mm-dd hh24:mi:ss')) addtime
+        FROM pc_g2d_product_change
+        WHERE CMID=#{cmid}
+        <!--商品编号-->
+        <if test="productBn != null and productBn != '' ">
+            AND PRODUCT_BN like  '%${productBn}%'
+        </if>
+        <!--商品名称-->
+        <if test="productName != null and productName != '' ">
+            AND product_name  like  '%${productName}%'
+        </if>
+        order by ADD_TIME desc
+    </sql>
+
+    <select id="queryG2dRecycledInvalidProduct" parameterType="java.util.Map"
+            resultType="com.qianmi.pc.api.g2d.pojo.G2dProductInvalid">
+        SELECT x.* FROM (SELECT t.*, rownum xrownum FROM (
+        <include refid="product_recycled_invalid_sql"/>
+        ) t  WHERE  rownum &lt;= #{end}) x  WHERE  xrownum > #{start}
+    </select>
+
+
+    <select id="queryRecycledInvalidProductTotalCount" parameterType="java.util.Map" resultType="int">
+        select count(1) from (<include refid="product_recycled_invalid_sql"/>)
+    </select>
+
+
+
+    <select id="queryProductG2dStatus"  resultType="com.qianmi.pc.api.item.pojo.Product">
+        select t1.product_id AS id, t2.MARKETABLE AS marketable, t1.STD_PRODUCT_ID AS stdProductId
+        FROM PC_Product_ext t1, QM_Product t2 WHERE t1.STD_PRODUCT_ID = t2.PRODUCT_ID
+        AND t1.DEL_FLAG=0
+        AND t1.PRODUCT_ID in
+        <foreach collection="productIdList" item="productId" separator="," open="(" close=")" index="i">
+            #{productId}
+        </foreach>
+        <if test="chainMasterId != null and chainMasterId != ''">
+            AND t1.CMID=#{chainMasterId}
+        </if>
+    </select>
+
+    <update id="updateProductG2dStatus">
+        UPDATE QM_Product t SET t.MARKETABLE=#{status} WHERE t.PRODUCT_ID=#{productId}
+    </update>
+
+</mapper>

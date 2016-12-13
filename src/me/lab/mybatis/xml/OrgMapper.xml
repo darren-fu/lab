@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qianmi.admin.dao.org.OrgMapper" >
+
+    <select id="list" resultType="com.qianmi.admin.pojo.org.Organization">
+        select
+        level depth,
+        t.org_id orgId,
+        t.pid pId,
+        t.org_name orgName,
+        t.have_storage storageState,
+        (
+        case level
+        when 1 then t.org_name
+        when 2 then '﹂'||t.org_name
+        when 3 then '&amp;emsp;﹂'||t.org_name
+        when 4 then '&amp;emsp;&amp;emsp;﹂'||t.org_name
+        end
+        ) as showOrgName
+        from
+        (
+        select * from qm_admin_org where admin_id = #{adminId}
+        ) t
+        connect by PRIOR t.org_id = t.pid start with t.org_id = #{orgId}
+        order siblings by t.org_id
+    </select>
+
+
+    <select id="queryRelStaffCountList" resultType="com.qianmi.admin.pojo.org.RelStaffExt">
+        select t.org_id orgId, count(t.user_id) count
+        from  qm_subaccount_org t
+        where t.admin_id = #{adminId}
+        group by t.org_id
+    </select>
+
+
+    <select id="saleAreaList" resultType="com.qianmi.admin.pojo.org.RelSaleArea">
+        select
+        t.org_Id orgId,
+        t.overAreaId areaId,
+        t.overAreaName areaName
+        from qm_admin_org_salearea t
+        where
+        t.admin_id = #{adminId}
+        <if test="orgId != null and orgId !=''">
+            and t.org_id = #{orgId}
+        </if>
+    </select>
+
+
+    <insert id="addOrg">
+        insert into qm_admin_org(org_id, pid, org_name, admin_Id, have_storage)
+        values
+        (
+        #{orgId, jdbcType = VARCHAR },
+        #{pId, jdbcType = VARCHAR },
+        #{orgName, jdbcType = VARCHAR },
+        #{adminId, jdbcType = VARCHAR },
+        #{storageState, jdbcType = NUMERIC}
+        )
+    </insert>
+
+
+    <select id="queryOrgById" resultType="com.qianmi.admin.pojo.org.Organization">
+        select
+        t.org_id orgId,
+        t.pid pId,
+        t.org_name orgName,
+        t.have_storage storageState
+        from qm_admin_org t
+        where t.admin_id = #{adminId} and t.org_id = #{orgId}
+    </select>
+
+
+    <select id="relStorageList" resultType="com.qianmi.admin.pojo.org.RelStorage">
+        select o.org_id orgId,s.overstorage storageId,s.id ,j.name  storageName from QM_ADMIN_ORG o,qm_admin_org_storage s,jxc_storage j
+        where o.admin_id=#{adminId} and j.user_code=#{adminId} and j.status!='2'
+        <if test="pId != null and pId !=''">
+            and o.org_id in (select t.org_id from qm_admin_org t where t.pid=#{pId} )
+        </if>
+        <if test="oId != null and oId !=''">
+            and o.org_id !=#{oId}
+        </if>
+        and o.org_id=s.org_id and s.overstorage=j.storage_id order by orgId
+    </select>
+
+
+    <select id="queryOrgByUserId" resultType="String">
+        select t.org_id
+        from qm_subaccount_org t
+        where t.admin_id = #{adminId} and t.user_id = #{userId}
+    </select>
+
+
+    <select id="querySaleAreaByOrgId" resultType="String">
+        select t.overAreaId
+        from qm_admin_org_salearea t
+        where t.admin_id = #{adminId} and t.org_id = #{orgId}
+    </select>
+</mapper>

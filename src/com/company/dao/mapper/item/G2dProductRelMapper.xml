@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianmi.pc.dao.g2d.item.G2dProductRelMapper">
+
+    <insert id="add">
+        INSERT INTO pc_product_relation
+        (id, product_id, parent_product_id, cmid, parent_cmid, relation_type) values
+        (#{rel.id,jdbcType=VARCHAR},#{rel.productId,jdbcType=VARCHAR}, #{rel.parentProductId,jdbcType=VARCHAR},
+            #{rel.chainMasterId,jdbcType=VARCHAR}, #{rel.parentChainMasterId,jdbcType=VARCHAR},#{rel.relationType,jdbcType=INTEGER})
+    </insert>
+
+    <!--批量插入 of583-->
+    <insert id="batchAdd">
+        INSERT INTO pc_product_relation
+        (id, product_id, parent_product_id, cmid, parent_cmid, relation_type)
+        <foreach collection="productRels" item="rel" index="index" separator="UNION ALL">
+            SELECT #{rel.id,jdbcType=VARCHAR},#{rel.productId,jdbcType=VARCHAR}, #{rel.parentProductId,jdbcType=VARCHAR},
+            #{rel.chainMasterId,jdbcType=VARCHAR}, #{rel.parentChainMasterId,jdbcType=VARCHAR},#{rel.relationType,jdbcType=INTEGER}
+            FROM dual
+        </foreach>
+    </insert>
+
+</mapper>

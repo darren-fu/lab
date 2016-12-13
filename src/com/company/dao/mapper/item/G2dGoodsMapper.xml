@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qianmi.pc.dao.g2d.item.G2dGoodsMapper">
+
+    <select id="listByProductIdsAndLine" resultType="com.qianmi.pc.api.item.pojo.Goods">
+        SELECT g.goods_id id,
+        g.cmid chainMasterId,
+        g.product_id productId,
+        g.gname name,
+        g.bid brandId,
+        g.bn,
+        g.typeid typeId,
+        g.local_store localStore,
+        g.cost,
+        g.price,
+        g.stock,
+        g.stockwarn stockWarn,
+        g.weight,
+        g.gorder,
+        gl.status,
+        g.buy_count buyCount,
+        g.sellpoint sellPoint,
+        g.min_order_quantity minOrderQuantity,
+        g.NOTICE_STOCK noticeStock,
+        g.mktPrice mktPrice,
+        g.std_goods_id standardGoodsId,
+        g.goods_barcode barCode,
+        g.from_sys fromSys,
+        g.proxy,
+        g.top,
+        decode(g.addtime,null,'',to_char(g.addtime,'yyyy-mm-dd hh24:mi:ss')) addTime,
+        decode(g.updtime,null,'',to_char(g.updtime,'yyyy-mm-dd hh24:mi:ss')) updateTime
+        FROM qm_goods g, pc_goods_line gl
+        WHERE g.goods_id = gl.goods_id and gl.line = #{line}and gl.product_id in
+        <foreach collection="productIds" item="productId" separator="," open="(" close=")" index="i">
+            #{productId}
+        </foreach>
+        <if test="chainMasterId != null and chainMasterId != ''">
+            AND g.cmid = #{chainMasterId}
+        </if>
+        and gl.del_flag = 0
+        order by g.gorder asc, g.goods_id asc
+    </select>
+
+    <!-- 查询货品规格 -->
+    <select id="listItemSpec" resultType="com.qianmi.pc.api.spec.pojo.ItemSpecRel">
+        SELECT r.pspid, r.psvid,p.spec_name propName,r.product_Id productId,r.std_product_id standardProductId,
+        r.goods_id goodsId, r.svkey valKey, r.svimg valImg,r.spid propId,r.svid valId,p.sorder
+        FROM PC_PRODUCT_SPEC p, QM_ITEM_SPEC_REL r, qm_spec_type c
+        WHERE p.pspid = r.pspid and r.spid = c.SPEC_ID and r.type_id = c.TYPE_ID
+        and r.product_id = #{productId}
+        <if test="null != chainMasterId">
+            And r.cmid = #{chainMasterId}
+        </if>
+        order by r.goods_id, c.sorder, r.spid, r.svid
+    </select>
+
+    <!-- 查询货品最小价格起批量 of342_WuDangPeng -->
+    <select id="listGoodsPriceMinQuantityById" resultType="com.qianmi.pc.api.item.pojo.GoodsPriceArea">
+        SELECT
+        p.ID                   id,
+        p.CMID                 chainMasterId,
+        p.PRODUCT_ID           productId,
+        p.GOODS_ID             goodsId,
+        p.MIN_ORDER_QUANTITY   goodsNum,
+        p.GOODS_PRICE price
+        from PC_PRICE_MIN_QUANTITY p
+        where p.CMID = #{chainMasterId} and  p.PRODUCT_ID = #{productId} and  p.GOODS_ID = #{goodsId}
+    </select>
+
+    <!-- 查询货品总数-->
+    <select id="countGoods" resultType="java.lang.Integer">
+        select count(a.goods_id) from qm_goods a, pc_goods_line b where a.cmid = #{chainMasterId} and a.goods_id = b.goods_id
+         and a.del_flag =0 and b.del_flag = 0 and b.status in (2,3)
+    </select>
+    <!-- 查询上架货品总数-->
+    <select id="countMarketableGoods" resultType="java.lang.Integer">
+        select count(a.goods_id) from qm_goods a, pc_goods_line b
+         where a.goods_id = b.goods_id and a.cmid = #{chainMasterId} and a.del_flag = 0 and b.status = 3 and b.del_flag = 0
+    </select>
+
+    <!-- 批量删除货品最小价格起批量 of342_WuDangPeng -->
+    <update id="deleteGoodsPriceMinQuantityList">
+        delete from PC_PRICE_MIN_QUANTITY where cmid=#{chainMasterId} and product_id=#{productId}
+    </update>
+
+    <!--批量插入货品最小价格起批量 of342_WuDangPeng-->
+    <insert id="addGoodsPriceMinQuantityList">
+        INSERT INTO PC_PRICE_MIN_QUANTITY (
+        ID,
+        CMID,
+        PRODUCT_ID,
+        GOODS_ID,
+        MIN_ORDER_QUANTITY,
+        GOODS_PRICE
+        )
+        SELECT pc_price_area_seq.nextval, a.* FROM (
+        <foreach collection="goodsPriceAreaList" item="goodsPriceArea" index="index" separator="union all" >
+            (SELECT
+            #{goodsPriceArea.chainMasterId, jdbcType=VARCHAR},
+            #{goodsPriceArea.productId, jdbcType=VARCHAR},
+            #{goodsPriceArea.goodsId, jdbcType=VARCHAR},
+            #{goodsPriceArea.goodsNum, jdbcType=VARCHAR},
+            #{goodsPriceArea.price, jdbcType=VARCHAR}
+            FROM dual)
+        </foreach>) a
+    </insert>
+
+    <!-- 批量删除价格区间 -->
+    <update id="deleteGoodsPriceAreaList">
+        UPDATE PC_PRICE_AREA
+        SET DEL_FLAG = 1
+        WHERE CMID = #{chainMasterId}
+        and product_id = #{productId}
+    </update>
+
+</mapper>
