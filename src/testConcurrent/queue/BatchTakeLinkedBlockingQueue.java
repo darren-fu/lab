@@ -14,10 +14,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Copyright: Copyright (c)
  * <p/>
- * Company: 江苏千米网络科技有限公司
  * <p/>
  *
- * @author 付亮(OF2101)
+ * @author 付亮
  * @version 1.0.0
  * @date 2016/7/28
  */
@@ -486,11 +485,6 @@ public class BatchTakeLinkedBlockingQueue<E> extends AbstractQueue<E>
             // 未达到指定数量，阻塞等待
             while (count.get() < takeSize) {
                 sizeEnough.await();
-                System.out.println("######sizeEnough.await############");
-                System.out.println("#######sizeEnough.await###########");
-                System.out.println("#####sizeEnough.await#############");
-                System.out.println("######sizeEnough.await############");
-
             }
 
             Node<E> h = head;
@@ -519,8 +513,6 @@ public class BatchTakeLinkedBlockingQueue<E> extends AbstractQueue<E>
                 //数据足够时，继续唤醒其他线程
                 sizeEnough.signal();
             }
-
-            System.out.println("take前有 " + c + " 个，take了 " + i + " 个");
         } finally {
             takeLock.unlock();
             if (signalNotFull) {

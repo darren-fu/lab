@@ -40,6 +40,9 @@ public class EchoServerInBoundHandler1 extends ChannelInboundHandlerAdapter {
 
         String response = "你好，欢迎连接本服务器！";
         ByteBuf resp = Unpooled.copiedBuffer(response.getBytes());
+
+
+
         ctx.write(resp);
         Thread.sleep(2000);
         System.out.println("handler1#输出完成，准备发送");

@@ -31,7 +31,7 @@ public class StringDecoder extends ChannelInboundHandlerAdapter {
         logger.info("StringDecoder : msg's type is " + msg.getClass());
         if (msg instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) msg;
-            reader = new ByteBufToBytes((int) HttpUtil.getContentLength(request));
+//            reader = new ByteBufToBytes((int) HttpUtil.getContentLength(request));
         }
 
         if (msg instanceof HttpContent) {

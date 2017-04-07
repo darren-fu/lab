@@ -1,5 +1,7 @@
 package testBean;
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -14,6 +16,7 @@ import java.util.Date;
  * @version 1.0.0
  * @date 2016/8/4
  */
+@Data
 public class Student {
     private String name;
     private int age;

@@ -6,25 +6,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 /**
- * 说明:扩展批量获取的能力，添加批量锁么，加入append，takebatch方法
- * append:使用tryLock，超时则返回，放弃添加队列
- * takebatch:批量take，size为初始化队列时设置
- * <p/>
- * Copyright: Copyright (c)
- * <p/>
- * Company: 江苏千米网络科技有限公司
- * <p/>
- *
- * @author 付亮(OF2101)
- * @version 1.0.0
- * @date 2016/7/28
+ * author: fuliang
+ * date: 2017/3/15
  */
-public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
-        implements BlockingQueue<E>, java.io.Serializable {
-    private static final long serialVersionUID = 4785439450221360370L;
+@SuppressWarnings("Duplicates")
+public class FixedBatchTakeBlockingQueue<E> extends AbstractQueue<E>
+        implements BlockingQueue<E>, java.io.Serializable  {
 
     /**
      * Linked list node class
@@ -38,7 +27,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
          * - this Node, meaning the successor is head.next
          * - null, meaning there is no successor (this is the last node)
          */
-        Node<E> next;
+        BatchTakeLinkedBlockingQueue.Node<E> next;
 
         Node(E x) {
             item = x;
@@ -59,13 +48,13 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      * Head of linked list.
      * Invariant: head.item == null
      */
-    transient Node<E> head;
+    transient BatchTakeLinkedBlockingQueue.Node<E> head;
 
     /**
      * Tail of linked list.
      * Invariant: last.next == null
      */
-    private transient Node<E> last;
+    private transient BatchTakeLinkedBlockingQueue.Node<E> last;
 
     /**
      * Lock held by take, poll, etc
@@ -140,7 +129,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      *
      * @param node the node
      */
-    private void enqueue(Node<E> node) {
+    private void enqueue(BatchTakeLinkedBlockingQueue.Node<E> node) {
         // assert putLock.isHeldByCurrentThread();
         // assert last.next == null;
         last = last.next = node;
@@ -154,8 +143,8 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
     private E dequeue() {
         // assert takeLock.isHeldByCurrentThread();
         // assert head.item == null;
-        Node<E> h = head;
-        Node<E> first = h.next;
+        BatchTakeLinkedBlockingQueue.Node<E> h = head;
+        BatchTakeLinkedBlockingQueue.Node<E> first = h.next;
         h.next = h; // help GC
         head = first;
         E x = first.item;
@@ -191,7 +180,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      * Creates a {@code LinkedBlockingQueue} with a capacity of
      * {@link Integer#MAX_VALUE}.
      */
-    public BatchTakeLinkedBlockingQueue2() {
+    public FixedBatchTakeBlockingQueue() {
         this(Integer.MAX_VALUE);
     }
 
@@ -202,7 +191,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      * @throws IllegalArgumentException if {@code capacity} is not greater
      *                                  than zero
      */
-    public BatchTakeLinkedBlockingQueue2(int capacity) {
+    public FixedBatchTakeBlockingQueue(int capacity) {
         this(capacity, capacity);
     }
 
@@ -213,12 +202,12 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      * @throws IllegalArgumentException if {@code capacity} is not greater
      *                                  than zero
      */
-    public BatchTakeLinkedBlockingQueue2(int capacity, int takeSize) {
+    public FixedBatchTakeBlockingQueue(int capacity, int takeSize) {
         if (capacity <= 0) throw new IllegalArgumentException();
         if (takeSize > capacity) takeSize = capacity;
         this.capacity = capacity;
         this.takeSize = takeSize;
-        last = head = new Node<E>(null);
+        last = head = new BatchTakeLinkedBlockingQueue.Node<E>(null);
     }
 
     /**
@@ -231,7 +220,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *                              of its elements are null
      */
-    public BatchTakeLinkedBlockingQueue2(Collection<? extends E> c) {
+    public FixedBatchTakeBlockingQueue(Collection<? extends E> c) {
         this();
         final ReentrantLock putLock = this.putLock;
         putLock.lock(); // Never contended, but necessary for visibility
@@ -242,7 +231,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                     throw new NullPointerException();
                 if (n == capacity)
                     throw new IllegalStateException("Queue full");
-                enqueue(new Node<E>(e));
+                enqueue(new BatchTakeLinkedBlockingQueue.Node<E>(e));
                 ++n;
             }
             count.set(n);
@@ -293,7 +282,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         // Note: convention in all put/take/etc is to preset local var
         // holding count negative to indicate failure unless set.
         int c = -1;
-        Node<E> node = new Node<E>(e);
+        BatchTakeLinkedBlockingQueue.Node<E> node = new BatchTakeLinkedBlockingQueue.Node<E>(e);
         final ReentrantLock putLock = this.putLock;
         final AtomicInteger count = this.count;
         putLock.lockInterruptibly();
@@ -344,7 +333,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                     return false;
                 nanos = notFull.awaitNanos(nanos);
             }
-            enqueue(new Node<E>(e));
+            enqueue(new BatchTakeLinkedBlockingQueue.Node<E>(e));
             c = count.getAndIncrement();
             if (c + 1 < capacity)
                 notFull.signal();
@@ -373,7 +362,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         if (count.get() == capacity)
             return false;
         int c = -1;
-        Node<E> node = new Node<E>(e);
+        BatchTakeLinkedBlockingQueue.Node<E> node = new BatchTakeLinkedBlockingQueue.Node<E>(e);
         final ReentrantLock putLock = this.putLock;
         putLock.lock();
         try {
@@ -411,12 +400,10 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         if (count.get() == capacity)
             return false;
         int c = -1;
-        Node<E> node = new Node<E>(e);
+        BatchTakeLinkedBlockingQueue.Node<E> node = new BatchTakeLinkedBlockingQueue.Node<E>(e);
         final ReentrantLock putLock = this.putLock;
         try {
-//            if (putLock.tryLock() || putLock.tryLock(timeout, unit)) {
-            if (putLock.tryLock(timeout, unit)) {
-
+            if (putLock.tryLock(0, TimeUnit.SECONDS) || putLock.tryLock(timeout, unit)) {
                 if (count.get() < capacity) {
                     enqueue(node);
                     c = count.getAndIncrement();
@@ -426,8 +413,6 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                     if (c + 1 >= takeSize) {
                         signalSizeEnough();
                     }
-                } else {
-                    System.out.println("###########################false");
                 }
             }
         } catch (InterruptedException ex) {
@@ -438,7 +423,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
             if (putLock.isHeldByCurrentThread()) {
                 putLock.unlock();
             } else {
-                System.out.println(Thread.currentThread().getName() + "没有获取到锁---------------------------------------------------");
+//                System.out.println(Thread.currentThread().getName() + "没有获取到锁---------------------------------------------------");
             }
         }
 
@@ -493,12 +478,12 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                 sizeEnough.await();
             }
 
-            Node<E> h = head;
+            BatchTakeLinkedBlockingQueue.Node<E> h = head;
             int i = 0;
             try {
                 while (i < takeSize) {
                     i++;
-                    Node<E> k = h.next;
+                    BatchTakeLinkedBlockingQueue.Node<E> k = h.next;
                     list.add(k.item);
                     k.item = null;
                     h.next = h;
@@ -519,8 +504,6 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                 //数据足够时，继续唤醒其他线程
                 sizeEnough.signal();
             }
-
-            System.out.println("take前有 " + c + " 个，take了 " + i + " 个");
         } finally {
             takeLock.unlock();
             if (signalNotFull) {
@@ -587,7 +570,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         final ReentrantLock takeLock = this.takeLock;
         takeLock.lock();
         try {
-            Node<E> first = head.next;
+            BatchTakeLinkedBlockingQueue.Node<E> first = head.next;
             if (first == null)
                 return null;
             else
@@ -600,7 +583,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
     /**
      * Unlinks interior Node p with predecessor trail.
      */
-    void unlink(Node<E> p, Node<E> trail) {
+    void unlink(BatchTakeLinkedBlockingQueue.Node<E> p, BatchTakeLinkedBlockingQueue.Node<E> trail) {
         // assert isFullyLocked();
         // p.next is not changed, to allow iterators that are
         // traversing p to maintain their weak-consistency guarantee.
@@ -627,7 +610,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         if (o == null) return false;
         fullyLock();
         try {
-            for (Node<E> trail = head, p = trail.next;
+            for (BatchTakeLinkedBlockingQueue.Node<E> trail = head, p = trail.next;
                  p != null;
                  trail = p, p = p.next) {
                 if (o.equals(p.item)) {
@@ -653,7 +636,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         if (o == null) return false;
         fullyLock();
         try {
-            for (Node<E> p = head.next; p != null; p = p.next)
+            for (BatchTakeLinkedBlockingQueue.Node<E> p = head.next; p != null; p = p.next)
                 if (o.equals(p.item))
                     return true;
             return false;
@@ -681,7 +664,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
             int size = count.get();
             Object[] a = new Object[size];
             int k = 0;
-            for (Node<E> p = head.next; p != null; p = p.next)
+            for (BatchTakeLinkedBlockingQueue.Node<E> p = head.next; p != null; p = p.next)
                 a[k++] = p.item;
             return a;
         } finally {
@@ -734,7 +717,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                         (a.getClass().getComponentType(), size);
 
             int k = 0;
-            for (Node<E> p = head.next; p != null; p = p.next)
+            for (BatchTakeLinkedBlockingQueue.Node<E> p = head.next; p != null; p = p.next)
                 a[k++] = (T) p.item;
             if (a.length > k)
                 a[k] = null;
@@ -747,7 +730,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
     public String toString() {
         fullyLock();
         try {
-            Node<E> p = head.next;
+            BatchTakeLinkedBlockingQueue.Node<E> p = head.next;
             if (p == null)
                 return "[]";
 
@@ -773,7 +756,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
     public void clear() {
         fullyLock();
         try {
-            for (Node<E> p, h = head; (p = h.next) != null; h = p) {
+            for (BatchTakeLinkedBlockingQueue.Node<E> p, h = head; (p = h.next) != null; h = p) {
                 h.next = h;
                 p.item = null;
             }
@@ -815,11 +798,11 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         try {
             int n = Math.min(maxElements, count.get());
             // count.get provides visibility to first n Nodes
-            Node<E> h = head;
+            BatchTakeLinkedBlockingQueue.Node<E> h = head;
             int i = 0;
             try {
                 while (i < n) {
-                    Node<E> p = h.next;
+                    BatchTakeLinkedBlockingQueue.Node<E> p = h.next;
                     c.add(p.item);
                     p.item = null;
                     h.next = h;
@@ -852,7 +835,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
      * @return an iterator over the elements in this queue in proper sequence
      */
     public Iterator<E> iterator() {
-        return new Itr();
+        return new FixedBatchTakeBlockingQueue.Itr();
     }
 
     private class Itr implements Iterator<E> {
@@ -862,8 +845,8 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
          * still have it to return even if lost race with a take etc.
          */
 
-        private Node<E> current;
-        private Node<E> lastRet;
+        private BatchTakeLinkedBlockingQueue.Node<E> current;
+        private BatchTakeLinkedBlockingQueue.Node<E> lastRet;
         private E currentElement;
 
         Itr() {
@@ -888,9 +871,9 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
          * - dequeued nodes (p.next == p)
          * - (possibly multiple) interior removed nodes (p.item == null)
          */
-        private Node<E> nextNode(Node<E> p) {
+        private BatchTakeLinkedBlockingQueue.Node<E> nextNode(BatchTakeLinkedBlockingQueue.Node<E> p) {
             for (; ; ) {
-                Node<E> s = p.next;
+                BatchTakeLinkedBlockingQueue.Node<E> s = p.next;
                 if (s == p)
                     return head.next;
                 if (s == null || s.item != null)
@@ -919,9 +902,9 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                 throw new IllegalStateException();
             fullyLock();
             try {
-                Node<E> node = lastRet;
+                BatchTakeLinkedBlockingQueue.Node<E> node = lastRet;
                 lastRet = null;
-                for (Node<E> trail = head, p = trail.next;
+                for (BatchTakeLinkedBlockingQueue.Node<E> trail = head, p = trail.next;
                      p != null;
                      trail = p, p = p.next) {
                     if (p == node) {
@@ -933,142 +916,6 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
                 fullyUnlock();
             }
         }
-    }
-
-    /**
-     * A customized variant of Spliterators.IteratorSpliterator
-     */
-    static final class LBQSpliterator<E> implements Spliterator<E> {
-        static final int MAX_BATCH = 1 << 25;  // max batch array size;
-        final BatchTakeLinkedBlockingQueue2<E> queue;
-        Node<E> current;    // current node; null until initialized
-        int batch;          // batch size for splits
-        boolean exhausted;  // true when no more nodes
-        long est;           // size estimate
-
-        LBQSpliterator(BatchTakeLinkedBlockingQueue2<E> queue) {
-            this.queue = queue;
-            this.est = queue.size();
-        }
-
-        public long estimateSize() {
-            return est;
-        }
-
-        public Spliterator<E> trySplit() {
-            Node<E> h;
-            final BatchTakeLinkedBlockingQueue2<E> q = this.queue;
-            int b = batch;
-            int n = (b <= 0) ? 1 : (b >= MAX_BATCH) ? MAX_BATCH : b + 1;
-            if (!exhausted &&
-                    ((h = current) != null || (h = q.head.next) != null) &&
-                    h.next != null) {
-                Object[] a = new Object[n];
-                int i = 0;
-                Node<E> p = current;
-                q.fullyLock();
-                try {
-                    if (p != null || (p = q.head.next) != null) {
-                        do {
-                            if ((a[i] = p.item) != null)
-                                ++i;
-                        } while ((p = p.next) != null && i < n);
-                    }
-                } finally {
-                    q.fullyUnlock();
-                }
-                if ((current = p) == null) {
-                    est = 0L;
-                    exhausted = true;
-                } else if ((est -= i) < 0L)
-                    est = 0L;
-                if (i > 0) {
-                    batch = i;
-                    return Spliterators.spliterator
-                            (a, 0, i, Spliterator.ORDERED | Spliterator.NONNULL |
-                                    Spliterator.CONCURRENT);
-                }
-            }
-            return null;
-        }
-
-        public void forEachRemaining(Consumer<? super E> action) {
-            if (action == null) throw new NullPointerException();
-            final BatchTakeLinkedBlockingQueue2<E> q = this.queue;
-            if (!exhausted) {
-                exhausted = true;
-                Node<E> p = current;
-                do {
-                    E e = null;
-                    q.fullyLock();
-                    try {
-                        if (p == null)
-                            p = q.head.next;
-                        while (p != null) {
-                            e = p.item;
-                            p = p.next;
-                            if (e != null)
-                                break;
-                        }
-                    } finally {
-                        q.fullyUnlock();
-                    }
-                    if (e != null)
-                        action.accept(e);
-                } while (p != null);
-            }
-        }
-
-        public boolean tryAdvance(Consumer<? super E> action) {
-            if (action == null) throw new NullPointerException();
-            final BatchTakeLinkedBlockingQueue2<E> q = this.queue;
-            if (!exhausted) {
-                E e = null;
-                q.fullyLock();
-                try {
-                    if (current == null)
-                        current = q.head.next;
-                    while (current != null) {
-                        e = current.item;
-                        current = current.next;
-                        if (e != null)
-                            break;
-                    }
-                } finally {
-                    q.fullyUnlock();
-                }
-                if (current == null)
-                    exhausted = true;
-                if (e != null) {
-                    action.accept(e);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public int characteristics() {
-            return Spliterator.ORDERED | Spliterator.NONNULL |
-                    Spliterator.CONCURRENT;
-        }
-    }
-
-    /**
-     * Returns a {@link Spliterator} over the elements in this queue.
-     * <p>
-     * <p>The returned spliterator is
-     * <a href="package-summary.html#Weakly"><i>weakly consistent</i></a>.
-     * <p>
-     * <p>The {@code Spliterator} reports {@link Spliterator#CONCURRENT},
-     * {@link Spliterator#ORDERED}, and {@link Spliterator#NONNULL}.
-     *
-     * @return a {@code Spliterator} over the elements in this queue
-     * @implNote The {@code Spliterator} implements {@code trySplit} to permit limited
-     * parallelism.
-     * @since 1.8
-     */
-    public Spliterator<E> spliterator() {
-        return new LBQSpliterator<E>(this);
     }
 
     /**
@@ -1089,7 +936,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
             s.defaultWriteObject();
 
             // Write out all elements in the proper order.
-            for (Node<E> p = head.next; p != null; p = p.next)
+            for (BatchTakeLinkedBlockingQueue.Node<E> p = head.next; p != null; p = p.next)
                 s.writeObject(p.item);
 
             // Use trailing null as sentinel
@@ -1113,7 +960,7 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
         s.defaultReadObject();
 
         count.set(0);
-        last = head = new Node<E>(null);
+        last = head = new BatchTakeLinkedBlockingQueue.Node<E>(null);
 
         // Read in all elements and place in queue
         for (; ; ) {
@@ -1124,4 +971,5 @@ public class BatchTakeLinkedBlockingQueue2<E> extends AbstractQueue<E>
             add(item);
         }
     }
+
 }
