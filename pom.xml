@@ -262,7 +262,11 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.6</version>
+        </dependency>
 
         <dependency>
             <groupId>ma.glasnost.orika</groupId>
@@ -279,7 +283,11 @@
             <artifactId>guava</artifactId>
             <version>21.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.ecwid.consul</groupId>
+            <artifactId>consul-api</artifactId>
+            <version>1.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>
