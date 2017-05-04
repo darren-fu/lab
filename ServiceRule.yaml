@@ -1,0 +1,174 @@
+#api定义
+#url: api地址， module：业务名称， log： 是否记录日志，
+#     requestId： 请求报文主键对应的JSON属性,JSONPATH语法， responseId： 响应报文主键对应的JSON属性,JSONPATH语法，
+#     contentReason： 原因对应的JSON属性
+
+apis:
+  - url: "/product_supplier/save"
+    module: "product_supplier"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "$.reason"
+  - url: "/language/create_language"
+    module: "language"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "新增语言"
+  - url: "/language/update_language"
+    module: "language"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新语言"
+  - url: "/site/create_site"
+    module: "site"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "新增站点"
+  - url: "/site/update_site"
+    module: "site"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新站点"
+  - url: "/category/create_category"
+    module: "category"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "新增分类"
+  - url: "/category/update_category"
+    module: "category"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新分类"
+  - url: "/attribute/create_attribute"
+    module: "attribute"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "新增属性"
+  - url: "/attribute/update_attribute"
+    module: "attribute"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新属性"
+  - url: "/product_type/create_product_type"
+    module: "product_type"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "新增商品类型"
+  - url: "/product_type/update_product_type"
+    module: "product_type"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新商品类型"
+  - url: "/marketing/complete"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "修改营销信息"
+  - url: "/marketing/bind_image_group"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "绑定图片组"
+  - url: "/marketing/save"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "修改营销信息"
+  - url: "/marketing/batch_complete"
+    module: "product"
+    log: true
+    requestId: "$.product_code_list[*]"
+    responseId: ""
+    contentReason: "绑定主站点"
+  - url: "/product/create_product_basic"
+    module: "product"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.product_code"
+    contentReason: "添加商品基础信息"
+  - url: "/product/update_product_basic"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "更新商品基础信息"
+  - url: "/product/create_product_name_multi"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "添加商品多语言名称"
+  - url: "/product/update_product_name_multi"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "编辑商品多语言名称"
+  - url: "/product/create_product_desc_multi"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "添加商品描述多语言"
+  - url: "/product/update_product_desc_multi"
+    module: "product"
+    log: true
+    requestId: "$.product_code"
+    responseId: ""
+    contentReason: "编辑商品描述多语言"
+  - url: "/model/create_model"
+    module: "model"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "创建模特"
+  - url: "/model/delete_model"
+    module: "model"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "删除模特"
+  - url: "/model/update_model"
+    module: "model"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新模特"
+  - url: "/tag/create_tag"
+    module: "tag"
+    log: true
+    requestId: ""
+    responseId: "$.info.data.id"
+    contentReason: "创建标签"
+  - url: "/tag/update_tag"
+    module: "tag"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "更新标签"
+  - url: "/image/create_image_group"
+    module: "image"
+    log: true
+    requestId: "$.batch_id"
+    responseId: ""
+    contentReason: "创建图片组信息"
+  - url: "/image/update_image_batch"
+    module: "image"
+    log: true
+    requestId: "$.id"
+    responseId: ""
+    contentReason: "$.edit_reason"
