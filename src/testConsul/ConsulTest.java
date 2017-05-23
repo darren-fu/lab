@@ -7,8 +7,8 @@ import com.ecwid.consul.v1.agent.model.NewService;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
-import com.google.code.ssm.mapper.JsonObjectMapper;
-import util.JsonMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class ConsulTest {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JsonProcessingException {
         ConsulTest consulTest = new ConsulTest();
 //        consulTest.removeAllCriticalService();
         System.out.println(QueryParams.DEFAULT);
@@ -38,7 +38,10 @@ public class ConsulTest {
         System.out.println(catalogService);
         QueryParams queryParams = new QueryParams(50000,60);
         Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
-        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(healthChecksState));
     }
 
 
