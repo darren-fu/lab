@@ -3,8 +3,12 @@ package testConsul;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.NewService;
+import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
+import com.google.code.ssm.mapper.JsonObjectMapper;
+import util.JsonMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +23,7 @@ public class ConsulTest {
     private static ConsulClient consulClient;
 
     static {
-        String host = "192.168.1.248";
+        String host = "localhost";
         int port = 8500;
 
         consulClient = new ConsulClient(host, port);
@@ -28,12 +32,29 @@ public class ConsulTest {
 
     public static void main(String[] args) {
         ConsulTest consulTest = new ConsulTest();
-        consulTest.removeAllCriticalService();
-
+//        consulTest.removeAllCriticalService();
+        System.out.println(QueryParams.DEFAULT);
+        Response<List<CatalogService>> catalogService = consulClient.getCatalogService("my-service", QueryParams.DEFAULT);
+        System.out.println(catalogService);
+        QueryParams queryParams = new QueryParams(50000,60);
+        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
+        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
     }
 
 
-    public void removeAllCriticalService(){
+    public void registerNodeService() {
+        NewService service = new NewService();
+        service.setName("my-service");
+        service.setAddress("127.0.0.1");
+        service.setPort(3000);
+        NewService.Check check = new NewService.Check();
+        check.setHttp("http://localhost:3000/health");
+        check.setInterval("20s");
+        service.setCheck(check);
+        consulClient.agentServiceRegister(service);
+    }
+
+    public void removeAllCriticalService() {
         Response<Map<String, List<String>>> catalogServices = consulClient.getCatalogServices(QueryParams.DEFAULT);
         for (String serviceName : catalogServices.getValue().keySet()) {
             removeCriticalServiceId(serviceName);
