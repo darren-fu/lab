@@ -10,6 +10,8 @@ import com.ecwid.consul.v1.health.model.HealthService;
 import com.google.code.ssm.mapper.JsonObjectMapper;
 import util.JsonMapper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,22 +35,50 @@ public class ConsulTest {
     public static void main(String[] args) {
         ConsulTest consulTest = new ConsulTest();
 //        consulTest.removeAllCriticalService();
-        System.out.println(QueryParams.DEFAULT);
-        Response<List<CatalogService>> catalogService = consulClient.getCatalogService("my-service", QueryParams.DEFAULT);
-        System.out.println(catalogService);
-        QueryParams queryParams = new QueryParams(50000,60);
-        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
-        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
+//        System.out.println(QueryParams.DEFAULT);
+//        Response<List<CatalogService>> catalogService = consulClient.getCatalogService("my-service", QueryParams.DEFAULT);
+//        System.out.println(catalogService);
+//        QueryParams queryParams = new QueryParams(50000,60);
+//        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
+//        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
+
+        consulTest.registerNodeService();
+//        consulTest.registerNodeService2();
     }
 
 
     public void registerNodeService() {
         NewService service = new NewService();
+        service.setId("my-service-3000");
         service.setName("my-service");
         service.setAddress("127.0.0.1");
         service.setPort(3000);
+        service.setTags(Collections.singletonList("weight=4"));
+
         NewService.Check check = new NewService.Check();
         check.setHttp("http://localhost:3000/health");
+        check.setInterval("20s");
+        service.setCheck(check);
+        consulClient.agentServiceRegister(service);
+
+//        registerNodeService();
+//        registerNodeService2();
+    }
+
+
+    public void registerNodeService2() {
+        NewService service = new NewService();
+        service.setId("my-service-3100");
+        service.setName("my-service");
+        service.setAddress("127.0.0.1");
+        List<String> tags = new ArrayList<>();
+        tags.add("weight=3");
+        tags.add("backup");
+        service.setTags(tags);
+
+        service.setPort(3100);
+        NewService.Check check = new NewService.Check();
+        check.setHttp("http://localhost:3100/health");
         check.setInterval("20s");
         service.setCheck(check);
         consulClient.agentServiceRegister(service);
