@@ -31,10 +31,11 @@ public class TestQueueTakeAndDrain {
 
                 Integer take = queue.take();
                 List<Integer> list = new ArrayList<>();
+                list.add(take);
                 queue.drainTo(list);
                 System.out.println("take:" + take);
                 System.out.println("list:" + ArrayUtils.toString(list));
-                
+
                 Thread.sleep(2000);
 
             }
