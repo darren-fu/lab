@@ -43,7 +43,7 @@ public class ConsulTest {
 //        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
 
         consulTest.registerNodeService();
-//        consulTest.registerNodeService2();
+        consulTest.registerNodeService2();
     }
 
 
