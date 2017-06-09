@@ -12,14 +12,16 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitMqClient {
     private static ConnectionFactory factory;
+    private static Connection connection;
 
     static {
         factory = new ConnectionFactory();
-        factory.setUsername("admin");
+        factory.setUsername("test");
         factory.setPassword("123456");
         factory.setHost("localhost");
         factory.setPort(5672);
         factory.setVirtualHost("/");
+        connection = getClient();
     }
 
     /**
@@ -29,13 +31,28 @@ public class RabbitMqClient {
      * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
-    public static Connection getClient() {
+    private static Connection getClient() {
         try {
             return factory.newConnection();
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+
+    /**
+     * Gets channel.
+     *
+     * @return the channel
+     */
+    public static Channel getChannel() {
+        try {
+            return connection.createChannel();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 //
@@ -70,6 +87,12 @@ public class RabbitMqClient {
         }
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
     public static void main(String[] args) throws IOException {
 //        RabbitMqClient.createQueue("");
 
@@ -88,7 +111,7 @@ public class RabbitMqClient {
 
         Connection conn2 = channel.getConnection();
         System.out.println(conn2 == client);
-        System.out.println(conn2.hashCode() );
+        System.out.println(conn2.hashCode());
         System.out.println(client.hashCode());
 
     }

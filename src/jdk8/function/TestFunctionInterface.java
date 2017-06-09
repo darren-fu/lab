@@ -17,7 +17,7 @@ import org.junit.Test;
 public class TestFunctionInterface {
 
     private String name = "TestFunctionInterface";
-//    Consumer<T>– 在T上执行一个操作，无返回结果
+//    ConsumerTest<T>– 在T上执行一个操作，无返回结果
 //    Supplier<T>–无输入参数，返回T的实例
 //    Predicate<T>–输入参数为T的实例，返回boolean值
 //    Function<T,R> –输入参数为T的实例，返回R的实例

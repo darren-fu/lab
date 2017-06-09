@@ -85,10 +85,10 @@ public class TestExchanger {
         public void run() {
             for (int i = 0; i < 1; i++) {
                 try {
-                    System.out.println("Consumer 等待交换数据,size:" + list.size());
+                    System.out.println("ConsumerTest 等待交换数据,size:" + list.size());
 
                     list = exchanger.exchange(list);
-                    System.out.println("Consumer 数据交换完成,size:" + list.size());
+                    System.out.println("ConsumerTest 数据交换完成,size:" + list.size());
 
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block

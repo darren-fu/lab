@@ -39,7 +39,7 @@ public class PreidcateConsumerDemo {
         student1 = updateStudentFee(student1,
                 //Lambda expression for Predicate interface
                 student -> student.grade > 8.5,
-                //Lambda expression for Consumer inerface
+                //Lambda expression for ConsumerTest inerface
                 student -> student.feeDiscount = 30.0);
 
         student1.printFee();

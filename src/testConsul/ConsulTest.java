@@ -9,6 +9,7 @@ import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class ConsulTest {
     private static ConsulClient consulClient;
 
     static {
-        String host = "localhost";
+        String host = "192.168.1.248";
         int port = 8500;
 
         consulClient = new ConsulClient(host, port);
@@ -42,6 +43,8 @@ public class ConsulTest {
         ObjectMapper mapper = new ObjectMapper();
 
         System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(healthChecksState));
+
+
     }
 
 
@@ -57,6 +60,7 @@ public class ConsulTest {
         consulClient.agentServiceRegister(service);
     }
 
+    @Test
     public void removeAllCriticalService() {
         Response<Map<String, List<String>>> catalogServices = consulClient.getCatalogServices(QueryParams.DEFAULT);
         for (String serviceName : catalogServices.getValue().keySet()) {

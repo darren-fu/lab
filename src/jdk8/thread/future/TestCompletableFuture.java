@@ -36,7 +36,7 @@ public class TestCompletableFuture {
 
     //因此，你可以根据方法的参数的类型来加速你的记忆。
     // Runnable 类型的参数会忽略计算的结果，
-    // Consumer 是纯消费计算结果，
+    // ConsumerTest 是纯消费计算结果，
     // BiConsumer 会组合另外一个CompletionStage纯消费，
     // Function 会对计算结果做转换，
     // BiFunction 会组合另外一个CompletionStage的计算结果做转换

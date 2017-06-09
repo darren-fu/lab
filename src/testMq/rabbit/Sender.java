@@ -11,17 +11,12 @@ import java.io.IOException;
 public class Sender {
 
 
-    private void getClient() {
-
-
-    }
-
 
     public static void main(String[] args) throws IOException {
 
         AMQP.BasicProperties properties = new AMQP.BasicProperties();
         properties = properties.builder().build();
-        Channel channel = RabbitMqClient.getClient().createChannel();
+        Channel channel = RabbitMqClient.getChannel();
         channel.basicQos(2);
         channel.queueDeclare("queue.test", true, false, false, null);
         channel.queueBind("queue.test", "local.direct", "key.test");
