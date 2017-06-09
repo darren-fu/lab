@@ -18,8 +18,9 @@ public class ConsumerTest {
 
         ExecutorService service = Executors.newFixedThreadPool(5);
 
+        // 同一个队列的消费者轮训获取message
         service.submit(() -> {
-            ConsumerTest.consumeMsg(queue1);
+            ConsumerTest.consumeMsg(queue2);
         });
 //        service.submit(() -> {
 //            ConsumerTest.consumeMsg(queue1);
@@ -32,6 +33,17 @@ public class ConsumerTest {
         try {
             Channel channel = RabbitMqClient.getChannel();
             SimpleConsumer simpleConsumer = new SimpleConsumer(channel);
+            channel.addConfirmListener(new ConfirmListener() {
+                @Override
+                public void handleAck(long deliveryTag, boolean multiple) throws IOException {
+                    System.out.println("@@@ACK success!");
+                }
+
+                @Override
+                public void handleNack(long deliveryTag, boolean multiple) throws IOException {
+                    System.out.println("###NACK success!");
+                }
+            });
             channel.basicQos(1);
             channel.basicConsume(queue, false, simpleConsumer);
 
