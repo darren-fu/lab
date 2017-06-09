@@ -18,6 +18,12 @@ public class Sender {
         properties = properties.builder().build();
         Channel channel = RabbitMqClient.getChannel();
         channel.confirmSelect();
+        /**
+         * 如果消息没有到exchange,则confirm回调,ack=false
+         如果消息到达exchange,则confirm回调,ack=true
+         exchange到queue成功,则不回调return
+         exchange到queue失败,则回调return(需设置mandatory=true,否则不回回调,消息就丢了)
+         */
 //        channel.basicQos(2);
 //        channel.queueDeclare("queue.test", true, false, false, null);
 //        channel.queueBind("queue.test", "local.direct", "key.test");
