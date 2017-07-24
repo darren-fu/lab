@@ -7,8 +7,8 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-
-        BigDecimal num = new BigDecimal("aaa");
+        System.out.println(("a" + "b" + "c").intern() == "abc");
+        BigDecimal num = new BigDecimal("12");
         DecimalFormat format = new DecimalFormat();
 
         format.applyPattern("#0.###");
