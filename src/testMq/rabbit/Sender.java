@@ -1,6 +1,7 @@
 package testMq.rabbit;
 
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConfirmListener;
 
@@ -40,7 +41,8 @@ public class Sender {
             }
         });
         System.out.println("#send msg");
-        channel.basicPublish("local.direct", "key.test", properties, String.valueOf("XXXXX").getBytes());
+        channel.exchangeDeclare("test.exchange", BuiltinExchangeType.DIRECT, true);
+        channel.basicPublish("test.exchange", "key.test", properties, String.valueOf("XXXXX").getBytes());
         System.out.println("#send ok");
 
 //        channel.waitForConfirms();

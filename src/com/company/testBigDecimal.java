@@ -3,7 +3,7 @@ package com.company;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-public class Main {
+public class testBigDecimal {
 
     public static void main(String[] args) {
 	// write your code here

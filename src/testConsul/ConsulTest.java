@@ -8,6 +8,7 @@ import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.google.code.ssm.mapper.JsonObjectMapper;
+import org.junit.Test;
 import util.JsonMapper;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class ConsulTest {
     private static ConsulClient consulClient;
 
     static {
-        String host = "localhost";
+        String host = "192.168.1.248";
         int port = 8500;
 
         consulClient = new ConsulClient(host, port);
@@ -34,7 +35,7 @@ public class ConsulTest {
 
     public static void main(String[] args) {
         ConsulTest consulTest = new ConsulTest();
-//        consulTest.removeAllCriticalService();
+        consulTest.removeAllCriticalService();
 //        System.out.println(QueryParams.DEFAULT);
 //        Response<List<CatalogService>> catalogService = consulClient.getCatalogService("my-service", QueryParams.DEFAULT);
 //        System.out.println(catalogService);
@@ -42,8 +43,8 @@ public class ConsulTest {
 //        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
 //        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
 
-        consulTest.registerNodeService();
-        consulTest.registerNodeService2();
+//        consulTest.registerNodeService();
+//        consulTest.registerNodeService2();
     }
 
 
@@ -84,6 +85,7 @@ public class ConsulTest {
         consulClient.agentServiceRegister(service);
     }
 
+    @Test
     public void removeAllCriticalService() {
         Response<Map<String, List<String>>> catalogServices = consulClient.getCatalogServices(QueryParams.DEFAULT);
         for (String serviceName : catalogServices.getValue().keySet()) {
