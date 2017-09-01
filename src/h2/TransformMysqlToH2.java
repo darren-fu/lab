@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 public class TransformMysqlToH2 {
 
     public static void main(String[] args) throws Exception {
-        File file = new File("/home/darrenfu/IdeaProjects/admin-center/admin-service/src/main/resources/testdb/schema.sql");
+        File file = new File("D:\\git\\marketing-platform\\marketing-platform-service\\src\\main\\resources\\testdb\\schema.sql");
 //        String content = "";//Files.toString(file, Charsets.UTF_8);
         String content = new Scanner(file).useDelimiter("\\Z").next();
 

@@ -26,14 +26,15 @@ public class ConsulTest {
     private static ConsulClient consulClient;
 
     static {
-        String host = "192.168.1.248";
+//        String host = "192.168.1.248";
+        String host = "localhost";
         int port = 8500;
 
         consulClient = new ConsulClient(host, port);
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ConsulTest consulTest = new ConsulTest();
         consulTest.removeAllCriticalService();
 //        System.out.println(QueryParams.DEFAULT);
@@ -43,8 +44,9 @@ public class ConsulTest {
 //        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
 //        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
 
-//        consulTest.registerNodeService();
+        consulTest.registerNodeService();
 //        consulTest.registerNodeService2();
+        Thread.sleep(1000000);
     }
 
 
@@ -54,7 +56,7 @@ public class ConsulTest {
         service.setName("my-service");
         service.setAddress("127.0.0.1");
         service.setPort(3000);
-        service.setTags(Collections.singletonList("weight=4"));
+        service.setTags(Collections.singletonList("weight=12"));
 
         NewService.Check check = new NewService.Check();
         check.setHttp("http://localhost:3000/health");

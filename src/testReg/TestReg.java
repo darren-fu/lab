@@ -2,6 +2,7 @@ package testReg;
 
 import org.junit.Test;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,13 +32,33 @@ public class TestReg {
         Pattern reg = Pattern.compile(pattern);
         Matcher m = reg.matcher(text);
 
-        while(m.find()){
+        while (m.find()) {
             System.out.println(m.group().replaceAll("^\\{|\\}$", ""));
         }
 
 
-        String name="fdsfdsr32ew$$#dsf32";
+        String name = "fdsfdsr32ew$$#dsf32";
         System.out.println(name.split("\\$\\$")[0]);
+
+    }
+
+
+    @Test
+    public void test2() {
+        String path = "/aaa/bbb/{name}/ccc/{id}";
+
+
+        String pattern = "\\{.+?\\}";
+
+        Pattern reg = Pattern.compile(pattern);
+
+        Matcher m = reg.matcher(path);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            System.out.println(m.group());
+            System.out.println(m.appendReplacement(sb, UUID.randomUUID().toString().substring(0, 4)));
+        }
+        System.out.println(sb.toString());
 
     }
 

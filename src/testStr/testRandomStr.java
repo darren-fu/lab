@@ -4,6 +4,11 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
+import util.DateFormatUtils;
+import util.DateTimeUtils;
+
+import java.text.ParseException;
+import java.util.Calendar;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 
@@ -46,6 +51,14 @@ public class testRandomStr {
     }
 
     @Test
-    public void testStrUtil() {
+    public void testStrUtil() throws ParseException {
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTime(DateFormatUtils.DEFAULT_ON_SECOND_FORMAT.parse("1980-12-12 04:12:09"));
+
+        System.out.println(calendar.get(Calendar.SECOND));
+        String pad = StringUtils.leftPad(String.valueOf(calendar.get(Calendar.SECOND)), 2, "0");
+        System.out.println(pad);
     }
 }
