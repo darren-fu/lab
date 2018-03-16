@@ -21,6 +21,7 @@ public class RabbitMqClient {
         factory.setHost("localhost");
         factory.setPort(5672);
         factory.setVirtualHost("/");
+        factory.setAutomaticRecoveryEnabled(true);
         connection = getClient();
     }
 

@@ -65,7 +65,7 @@ public class EchoServer {
 
                             p.addLast(new EchoServerInBoundHandler2());
                             p.addLast(new EchoServerInBoundHandler1());
-                            p.addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+                           // p.addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
                             p.addLast(new EchoServerEventTrigger());
                         }
                     });

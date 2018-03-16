@@ -1,6 +1,7 @@
 package testMq.rabbit;
 
 import com.rabbitmq.client.*;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -20,60 +21,141 @@ public class ConsumerTest {
 
         // 同一个队列的消费者轮训获取message
         service.submit(() -> {
-            ConsumerTest.consumeMsg(queue2);
+            ConsumerTest.consumeMsg2(queue2);
         });
-//        service.submit(() -> {
-//            ConsumerTest.consumeMsg(queue1);
-//        });
+        service.submit(() -> {
+            ConsumerTest.consumeMsg2(queue2);
+        });
     }
 
 
+    @Test
+    public void test111() throws InterruptedException {
+        ExecutorService service = Executors.newFixedThreadPool(5);
+        service.submit(() -> {
+            ConsumerTest.consumeMsg2(queue2);
+        });
+        Thread.sleep(100000L * 30);
+    }
+    @Test
+    public void test222() throws InterruptedException {
+        ExecutorService service = Executors.newFixedThreadPool(5);
+        service.submit(() -> {
+            ConsumerTest.consumeMsg3(queue2);
+        });
+        Thread.sleep(100000L * 30);
+    }
+
     public static void consumeMsg(String queue) {
+        while (true) {
+            try {
+                Channel channel = RabbitMqClient.getChannel();
+                SimpleConsumer simpleConsumer = new SimpleConsumer(channel);
+                channel.addConfirmListener(new ConfirmListener() {
+                    @Override
+                    public void handleAck(long deliveryTag, boolean multiple) throws IOException {
+                        System.out.println("@@@ACK success!");
+                    }
 
-        try {
-            Channel channel = RabbitMqClient.getChannel();
-            SimpleConsumer simpleConsumer = new SimpleConsumer(channel);
-            channel.addConfirmListener(new ConfirmListener() {
-                @Override
-                public void handleAck(long deliveryTag, boolean multiple) throws IOException {
-                    System.out.println("@@@ACK success!");
-                }
-
-                @Override
-                public void handleNack(long deliveryTag, boolean multiple) throws IOException {
-                    System.out.println("###NACK success!");
-                }
-            });
-            channel.basicQos(1);
-            channel.basicConsume(queue, false, simpleConsumer);
+                    @Override
+                    public void handleNack(long deliveryTag, boolean multiple) throws IOException {
+                        System.out.println("###NACK success!");
+                    }
+                });
+                channel.basicQos(1);
+                channel.basicConsume(queue, false, simpleConsumer);
 
 //            while (true) {
 ////                channel.
 ////                simpleConsumer
 //                Thread.sleep(1000);
 //            }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void consumeMsg2(String queue) {
+        Channel channel = RabbitMqClient.getChannel();
+
+        boolean autoAck = false;
+        try {
+            channel.basicQos(1);
+            channel.basicConsume(queue, autoAck, Thread.currentThread().getName(),
+                    new DefaultConsumer(channel) {
+                        @Override
+                        public void handleDelivery(String consumerTag,
+                                                   Envelope envelope,
+                                                   AMQP.BasicProperties properties,
+                                                   byte[] body)
+                                throws IOException {
+                            String routingKey = envelope.getRoutingKey();
+                            String contentType = properties.getContentType();
+                            long deliveryTag = envelope.getDeliveryTag();
+                            // (process the message components here ...)
+                            System.out.println(channel.getChannelNumber() + ":msg:" + new String(body));
+
+                            channel.basicAck(deliveryTag, false);
+                        }
+                    });
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
-    public static void consumeQueueMsg(String queue) {
+    public static void consumeMsg3(String queue) {
+        Channel channel = RabbitMqClient.getChannel();
 
+        boolean autoAck = false;
         try {
-            Channel channel = RabbitMqClient.getChannel();
-            QueueingConsumer consumer = new QueueingConsumer(channel);
-            channel.basicConsume(queue, true, consumer);
             channel.basicQos(1);
-            while (true) {
+            channel.basicConsume(queue, autoAck, Thread.currentThread().getName(),
+                    new DefaultConsumer(channel) {
+                        @Override
+                        public void handleDelivery(String consumerTag,
+                                                   Envelope envelope,
+                                                   AMQP.BasicProperties properties,
+                                                   byte[] body)
+                                throws IOException {
+                            String routingKey = envelope.getRoutingKey();
+                            String contentType = properties.getContentType();
+                            long deliveryTag = envelope.getDeliveryTag();
+                            // (process the message components here ...)
+                            System.out.println(channel.getChannelNumber() + ":msg:" + new String(body));
+
+//                            channel.basicAck(deliveryTag, false);
+                        }
+                    });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public static void consumeQueueMsg(String queue) {
+        Channel channel = RabbitMqClient.getChannel();
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+
+        while (true) {
+            try {
+                channel.basicConsume(queue, false, consumer);
+                channel.basicQos(1);
 //                channel.
                 QueueingConsumer.Delivery delivery = consumer.nextDelivery();
                 Thread.sleep(1000);
+                System.out.println(channel.getChannelNumber() + ":msg:" + new String(delivery.getBody()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
+
     }
 
     private static class SimpleConsumer implements Consumer {
@@ -119,13 +201,13 @@ public class ConsumerTest {
             System.out.println("handleDelivery..." + consumerTag + ",msg:" + new String(body));
             System.out.println("envelope:" + envelope);
             System.out.println("properties:" + properties);
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            channel.basicAck(envelope.getDeliveryTag(), false);
-            System.out.println("=====================ACK : " + new String(body) + "==========================");
+//            try {
+//                Thread.sleep(10000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+            //channel.basicAck(envelope.getDeliveryTag(), false);
+            //  System.out.println("=====================ACK : " + new String(body) + "==========================");
 
         }
     }

@@ -25,7 +25,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("1#channelRegistered...");
+        System.out.println("Inbound#1#channelRegistered...");
         ctx.fireChannelRegistered();
     }
 
@@ -37,7 +37,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("2#channelUnregistered...");
+        System.out.println("Inbound#2#channelUnregistered...");
 
         ctx.fireChannelUnregistered();
     }
@@ -50,7 +50,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("3#channelActive...");
+        System.out.println("Inbound#3#channelActive...");
 
         ctx.fireChannelActive();
     }
@@ -63,7 +63,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("4#channelInactive...");
+        System.out.println("Inbound#4#channelInactive...");
 
         ctx.fireChannelInactive();
     }
@@ -76,7 +76,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("5#channelRead...");
+        System.out.println("Inbound#5#channelRead...");
         Thread.sleep(2000);
         ctx.fireChannelRead(msg);
     }
@@ -89,7 +89,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("6#channelReadComplete...");
+        System.out.println("Inbound#6#channelReadComplete...");
 
         ctx.fireChannelReadComplete();
     }
@@ -102,7 +102,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        System.out.println("7#userEventTriggered...");
+        System.out.println("Inbound#7#userEventTriggered...");
 
         ctx.fireUserEventTriggered(evt);
     }
@@ -115,7 +115,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("8#channelWritabilityChanged...");
+        System.out.println("Inbound#8#channelWritabilityChanged...");
 
         ctx.fireChannelWritabilityChanged();
     }
@@ -129,7 +129,7 @@ public class EchoServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
-        System.out.println("9#exceptionCaught...");
+        System.out.println("Inbound#9#exceptionCaught...");
 
         ctx.fireExceptionCaught(cause);
     }

@@ -44,7 +44,7 @@ public class EchoServerInBoundHandler1 extends ChannelInboundHandlerAdapter {
 
 
         ctx.write(resp);
-        Thread.sleep(2000);
+        Thread.sleep(10000);
         System.out.println("handler1#输出完成，准备发送");
         ctx.fireChannelRead(msg);
     }

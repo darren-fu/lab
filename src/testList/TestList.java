@@ -1,7 +1,10 @@
 package testList;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 说明:
@@ -18,20 +21,55 @@ import java.util.List;
 public class TestList {
 
     public static void main(String[] args) {
+        int i = 100_0000;
+        TestList t = new TestList();
 
-        List<Integer> list = new ArrayList<>();
-
-        for (int i = 0; i < 1000; i++) {
-            list.add(i);
-        }
-
-        list.subList(0, 100).clear();
-        System.out.println(list.size());
-        System.out.println(list.get(0));
+        t.table();
+        t.table();
+        t.table();
+        t.map();
+        t.map();
+        t.map();
 
     }
 
+    private void table() {
+        int m = 100_0000;
+        long start = System.currentTimeMillis();
 
+        for (int i1 = 0; i1 < m; i1++) {
 
+            HashBasedTable<Object, Object, Object> table = HashBasedTable.create();
 
+            for (int i = 0; i < 100; i++) {
+                table.put(i, (i + 1), i);
+            }
+            for (Table.Cell<Object, Object, Object> cell : table.cellSet()) {
+                String result = cell.getColumnKey() + "" + cell.getRowKey();
+            }
+        }
+        long end = System.currentTimeMillis();
+
+        System.out.println("table->" + (end - start));
+    }
+
+    private void map() {
+        int m = 100_0000;
+        long start = System.currentTimeMillis();
+
+        for (int i1 = 0; i1 < m; i1++) {
+
+            Map<Object, Object> table = new HashMap();
+
+            for (int i = 0; i < 100; i++) {
+                table.put(i, i);
+            }
+            for (Map.Entry<Object, Object> entry : table.entrySet()) {
+                String result = (entry.getKey() + "" + entry.getValue());
+            }
+        }
+        long end = System.currentTimeMillis();
+
+        System.out.println("map->" + (end - start));
+    }
 }

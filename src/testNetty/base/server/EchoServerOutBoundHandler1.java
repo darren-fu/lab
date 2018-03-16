@@ -31,7 +31,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
     public void bind(ChannelHandlerContext ctx, SocketAddress localAddress,
                      ChannelPromise promise) throws Exception {
 
-        System.out.println("EchoServerOutBoundHandler1 # bind");
+        System.out.println("Outbound1 # bind");
         ctx.bind(localAddress, promise);
     }
 
@@ -44,7 +44,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
     @Override
     public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress,
                         SocketAddress localAddress, ChannelPromise promise) throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # connect");
+        System.out.println("Outbound1 # connect");
 
         ctx.connect(remoteAddress, localAddress, promise);
     }
@@ -58,7 +58,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
     @Override
     public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise)
             throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # disconnect");
+        System.out.println("Outbound1 # disconnect");
 
         ctx.disconnect(promise);
     }
@@ -72,7 +72,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
     @Override
     public void close(ChannelHandlerContext ctx, ChannelPromise promise)
             throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # close");
+        System.out.println("Outbound1 # close");
 
         ctx.close(promise);
     }
@@ -85,7 +85,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
      */
     @Override
     public void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # deregister");
+        System.out.println("Outbound1 # deregister");
 
         ctx.deregister(promise);
     }
@@ -98,7 +98,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
      */
     @Override
     public void read(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # read");
+        System.out.println("Outbound1 # read");
 
         ctx.read();
     }
@@ -111,7 +111,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
      */
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # write:" + ((ByteBuf)msg).toString(Charset.defaultCharset()));
+        System.out.println("Outbound1 # write:" + ((ByteBuf)msg).toString(Charset.defaultCharset()));
 
         ctx.write(msg, promise);
     }
@@ -124,7 +124,7 @@ public class EchoServerOutBoundHandler1 extends ChannelOutboundHandlerAdapter {
      */
     @Override
     public void flush(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("EchoServerOutBoundHandler1 # flush");
+        System.out.println("Outbound1 # flush");
 
         ctx.flush();
     }
