@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * author: fuliang
@@ -26,8 +27,8 @@ public class ConsulTest {
     private static ConsulClient consulClient;
 
     static {
-//        String host = "192.168.1.248";
-        String host = "localhost";
+        String host = "192.168.1.248";
+//        String host = "localhost";
         int port = 8500;
 
         consulClient = new ConsulClient(host, port);
@@ -44,9 +45,13 @@ public class ConsulTest {
 //        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
 //        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
 
-        consulTest.registerNodeService();
+//        consulTest.registerNodeService();
 //        consulTest.registerNodeService2();
         Thread.sleep(1000000);
+
+
+        ArrayBlockingQueue queue = new ArrayBlockingQueue(0);
+
     }
 
 
