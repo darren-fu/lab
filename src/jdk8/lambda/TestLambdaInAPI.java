@@ -13,10 +13,10 @@ import java.util.stream.IntStream;
  * <p/>
  * Copyright: Copyright (c)
  * <p/>
- * Company: 江苏千米网络科技有限公司
+ * Company:
  * <p/>
  *
- * @author 付亮(OF2101)
+ * @author darrenfu
  * @version 1.0.0
  * @date 2016/4/25
  */

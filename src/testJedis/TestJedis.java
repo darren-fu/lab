@@ -3,12 +3,14 @@ package testJedis;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import util.JsonMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,35 +19,78 @@ import java.util.List;
  * <p/>
  * Copyright: Copyright (c)
  * <p/>
- * Company: 江苏千米网络科技有限公司
+ * Company:
  * <p/>
  *
- * @author 付亮(OF2101)
+ * @author darrenfu
  * @version 1.0.0
- * @date 2016/10/20
+ * @date 2016 /10/20
  */
 public class TestJedis {
-    public static void main(String[] args) {
 
-        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        JedisPool jedisPool = new JedisPool();
+    /**
+     * The Jedis pool.
+     */
+    static JedisPool jedisPool = new JedisPool();
 
-        User user1 = new User("user1", "addr1");
-        User user2 = new User("user2", "addr2");
-        List<User> list = new ArrayList();
 
-        list.add(user1);
-        list.add(user2);
+    private static final Long RELEASE_SUCCESS = 1L;
 
-        Response response = new Response();
-        response.setCode("0");
-        response.setObj(list);
+    private static final String LOCK_SUCCESS = "OK";
+    private static final String SET_IF_NOT_EXIST = "NX";
+    private static final String SET_WITH_EXPIRE_TIME = "PX";
 
+    /**
+     * 尝试获取分布式锁
+     *
+     * @param lockKey    锁
+     * @param requestId  请求标识
+     * @param expireTime 超期时间
+     * @return 是否获取成功 boolean
+     */
+    public static boolean tryGetDistributedLock(String lockKey, String requestId, int expireTime) {
         try (Jedis jedis = jedisPool.getResource()) {
+            String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
 
-            jedis.set("test1", JsonMapper.defaultMapper().toJson(response));
+            if (LOCK_SUCCESS.equals(result)) {
+                return true;
+            }
         }
+        return false;
 
+    }
+
+    /**
+     * 释放分布式锁
+     *
+     * @param lockKey   锁
+     * @param requestId 请求标识
+     * @return 是否释放成功 boolean
+     */
+    public static boolean releaseDistributedLock(String lockKey, String requestId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+            Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));
+
+            if (RELEASE_SUCCESS.equals(result)) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    /**
+     * Test lock.
+     */
+    @Test
+    public void testLock() {
+        String key = "lock_key";
+        String val = "lock_val";
+        boolean getLock = TestJedis.tryGetDistributedLock(key, val, 1000 * 5);
+        System.out.println("getLock:" + getLock);
+        boolean releaseLock = TestJedis.releaseDistributedLock(key, val);
+        System.out.printf("releaseLock:" + releaseLock);
 
     }
 

@@ -1,10 +1,8 @@
 package jdk8.thread.future;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -13,20 +11,15 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.concurrent.CompletableFuture.anyOf;
-import static java.util.stream.Collectors.toList;
-import static javafx.scene.input.KeyCode.O;
-import static org.apache.commons.lang3.StringUtils.join;
-
 /**
  * 说明:
  * <p/>
  * Copyright: Copyright (c)
  * <p/>
- * Company: 江苏千米网络科技有限公司
+ * Company:
  * <p/>
  *
- * @author 付亮(OF2101)
+ * @author darrenfu
  * @version 1.0.0
  * @date 2016/11/1
  */
@@ -55,47 +48,133 @@ public class TestCompletableFuture {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("Future完成");
 
             future.complete("complete");
+            System.out.println("Future完成");
+
         }
+    }
+
+    public static class TestObject {
+
+        public int num = 0;
+
+
+        public void before() {
+            num++;
+            System.out.println("before:" + num);
+        }
+
+        public String after() {
+            num++;
+            System.out.println("after:" + num);
+            return "" + num;
+        }
+
+    }
+
+    @Test
+    public void testCompleteWithObject() {
+        TestObject testObject = new TestObject();
+        testObject.before();
+        CompletableFuture.runAsync(() -> {
+            System.out.println("启动:" + Thread.currentThread().getName());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("完成");
+        }).thenApply((v) -> testObject.after()).join();
     }
 
 
     @Test
+    public void testCompleteBlock() throws ExecutionException, InterruptedException {
+        Executor threadPool = Runnable::run;
+
+//        ExecutorService threadPool = Executors.newCachedThreadPool();
+
+        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("启动:" + Thread.currentThread().getName());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("完成");
+            throw new RuntimeException("XX");
+//            return "100";
+        });
+        CompletableFuture<String> future1 = future.thenApply((v) -> {
+            System.out.println("handle:" + Thread.currentThread().getName());
+            return "tt";
+        });
+//                .exceptionally((e) -> {
+//                    System.out.println("exceptionally:" + e);
+//                    return "ttxx";
+//                })
+        CompletableFuture<String> future2 = future1.whenComplete((v, e) -> {
+            System.out.println("whenComplete:" + v + ",e:" + e);
+        });
+        future2.join();
+        System.out.println(future2.get());
+
+        Thread.currentThread();
+
+
+    }
+
+
+    public class CurrentThreadExecutor implements Executor {
+        public void execute(Runnable r) {
+            r.run();
+        }
+    }
+
+    private static class MainExecutor implements Executor {
+        @Override
+        public void execute(Runnable command) {
+//            Thread.currentThread().e;
+        }
+    }
+
+    @Test
     public void testComplete() throws ExecutionException, InterruptedException {
         CompletableFuture<String> future = new CompletableFuture<>();
+        long start = System.currentTimeMillis();
         future.thenApply((result) -> {
-            System.out.println("result:" + result);
+            System.out.println("result:" + result + ",cost:" + (System.currentTimeMillis() - start) / 1000);
             return result;
         });
         System.out.println("启动");
         FutureThread futureThread = new FutureThread(future);
         new Thread(futureThread).start();
         System.out.println("等待结果");
-        String result = future.get();
-        System.out.println("结果：" + result);
+//        String result = future.get();
+//        System.out.println("结果：" + result);
+        Thread.sleep(10_000L);
+        System.out.println("done");
     }
 
 
     @Test
     public void testSupply() throws ExecutionException, InterruptedException {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            System.out.println("启动");
+        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("future启动");
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("完成");
+            System.out.println("future完成");
 
             return "42";
-        });
+        }).thenAccept(v -> System.out.println("获取结果:" + v));
 
         System.out.println("启动");
         System.out.println("等待结果");
-        String result = future.get();
-        System.out.println("结果：" + result);
+        System.out.println("结果：" + future.get());
     }
 
     /**
@@ -196,7 +275,6 @@ public class TestCompletableFuture {
 
             return user;
         });
-
         System.out.println("结果：" + future.get());
     }
 
