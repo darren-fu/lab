@@ -6,7 +6,8 @@
         </layout>
     </appender>
 
-    <logger name="org.apache" level="INFO"/>
+    <logger name="org.apache" level="WARN"/>
+    <logger name="ch.qos" level="WARN"/>
 
     <root level="INFO">
         <appender-ref ref="stdout"/>

@@ -8,6 +8,7 @@ import util.DateFormatUtils;
 import util.DateTimeUtils;
 
 import java.text.ParseException;
+import java.util.Base64;
 import java.util.Calendar;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
@@ -17,10 +18,10 @@ import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
  * <p/>
  * Copyright: Copyright (c)
  * <p/>
- * Company: 江苏千米网络科技有限公司
+ * Company:
  * <p/>
  *
- * @author 付亮(OF2101)
+ * @author darrenfu
  * @version 1.0.0
  * @date 2016/10/24
  */
@@ -49,6 +50,15 @@ public class testRandomStr {
         }
 
     }
+
+
+    @Test
+    public void testBase64(){
+        byte[] encode = Base64.getEncoder().encode("{\"siteuid\":\"www\",\"country\":\"\",\"post_code\":\"761000\",\"need_warehouse\":false,\"goods_sn_list\":[{\"goods_sn\":\"testsku001\",\"size\":\"xxl\"}]}".getBytes());
+
+        System.out.println(new String(encode));
+    }
+
 
     @Test
     public void testStrUtil() throws ParseException {
