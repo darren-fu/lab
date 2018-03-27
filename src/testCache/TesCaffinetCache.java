@@ -1,5 +1,6 @@
 package testCache;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -24,24 +25,26 @@ public class TesCaffinetCache {
 
     private volatile static int value = 1;
 
-    private static LoadingCache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000)
+    //    private static LoadingCache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000)
+    private static Cache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000)
             .expireAfterWrite(5, TimeUnit.SECONDS)
-            .refreshAfterWrite(1, TimeUnit.SECONDS)
-            .build(new CacheLoader<String, String>() {
-                       public String load(String key) throws InterruptedException {
-                           System.out.println("load by " + Thread.currentThread().getName());
-                           return createValue(key);
-                       }
-
-
-                       @Override
-                       public ListenableFuture<String> reload(String key, String oldValue)
-                               throws Exception {
-                           System.out.println("reload by " + Thread.currentThread().getName());
-                           return Futures.immediateFuture(createValue(key));
-                       }
-                   }
-            );
+//            .refreshAfterWrite(1, TimeUnit.SECONDS)
+            .build();
+//            .build(new CacheLoader<String, String>() {
+//                       public String load(String key) throws InterruptedException {
+//                           System.out.println("load by " + Thread.currentThread().getName());
+//                           return createValue(key);
+//                       }
+//
+//
+//                       @Override
+//                       public ListenableFuture<String> reload(String key, String oldValue)
+//                               throws Exception {
+//                           System.out.println("reload by " + Thread.currentThread().getName());
+//                           return Futures.immediateFuture(createValue(key));
+//                       }
+//                   }
+//            );
 
     //创建value
     private static String createValue(String key) throws InterruptedException {
@@ -97,7 +100,10 @@ public class TesCaffinetCache {
                 barrier.await();
 //                Thread.sleep((long) (Math.random() * 4000));
                 //每个client随机睡眠，为了充分测试refresh和load
-                System.out.println(Thread.currentThread().getName() + ",val:" + cache.get("key"));
+                System.out.println(Thread.currentThread().getName() + ",val:" + cache.get("key", () -> {
+                    System.out.println("load by " + Thread.currentThread().getName());
+                    return createValue("");
+                }));
                 latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
