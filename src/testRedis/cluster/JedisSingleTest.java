@@ -151,6 +151,12 @@ public class JedisSingleTest {
     }
 
 
+    private String[] randomKey(int size){
+        int nextInt = RandomUtils.nextInt(0, 100_000 - 500);
+        String[] keyArr = getKey(nextInt, size);
+        return keyArr;
+    }
+
     private String[] getKey(int num, int size) {
         String[] keys = new String[size];
 

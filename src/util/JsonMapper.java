@@ -54,9 +54,9 @@ public class JsonMapper {
         }
 
         SimpleModule javaTimeModule = new SimpleModule();
-        javaTimeModule.addSerializer(Date.class, new JsonDateSerializer());
-        javaTimeModule.addDeserializer(Date.class, new JsonDateDeserializer());
-        mapper.registerModule(javaTimeModule);
+//        javaTimeModule.addSerializer(Date.class, new JsonDateSerializer());
+//        javaTimeModule.addDeserializer(Date.class, new JsonDateDeserializer());
+//        mapper.registerModule(javaTimeModule);
         // 设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
