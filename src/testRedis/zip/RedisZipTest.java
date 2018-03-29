@@ -1,8 +1,5 @@
 package testRedis.zip;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -13,10 +10,6 @@ import testRedis.zip.entity.SimpleObject;
 import util.JsonMapper;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -99,8 +92,128 @@ public class RedisZipTest {
             jedis.set(key[0].getBytes(), json.getBytes());
             return null;
         });
+    }
 
 
+    @Test
+    public void testSetJsonZip() {
+
+        System.out.println("----------------------\n");
+        System.out.println("单个Key ZIP - set - String");
+        doLoop(10, 100_000, (jedis) -> {
+            SimpleObject simpleObject = new SimpleObject();
+            String json = JsonMapper.INSTANCE.toJson(simpleObject);
+            byte[] compress = ZipFunctions.SnappyZip.compress(json.getBytes());
+            String[] key = randomKey(1);
+            jedis.set(key[0].getBytes(), compress);
+            return null;
+        });
+
+        System.out.println("----------------------\r\n");
+        System.out.println("单个Key - set - Byte");
+        doLoop(10, 100_000, (jedis) -> {
+            SimpleObject simpleObject = new SimpleObject();
+            String json = JsonMapper.INSTANCE.toJson(simpleObject);
+            String[] key = randomKey(1);
+            jedis.set(key[0].getBytes(), json.getBytes());
+            return null;
+        });
+    }
+
+    @Test
+    public void testJsonGetAndSet() {
+        SimpleObject so = new SimpleObject();
+        String data = JsonMapper.INSTANCE.toJson(so);
+        initRedisData(data);
+
+        System.out.println("----------------------\n");
+        System.out.println("未压缩 单个Key - set - String");
+        doLoop(10, 100_000, (jedis) -> {
+            SimpleObject simpleObject = new SimpleObject();
+            String json = JsonMapper.INSTANCE.toJson(simpleObject);
+            String[] key = randomKey(1);
+            jedis.set(key[0], json);
+            return null;
+        });
+
+        System.out.println("----------------------\r\n");
+        System.out.println("未压缩 单个Key - get - String");
+        doLoop(10, 100_000, (jedis) -> {
+            String[] key = randomKey(1);
+            String val = jedis.get(key[0]);
+            SimpleObject simpleObject = JsonMapper.INSTANCE.fromJson(val, SimpleObject.class);
+            return null;
+        });
+    }
+
+
+    @Test
+    public void testJsonZipGetAndSet() {
+        SimpleObject so = new SimpleObject();
+        String data = JsonMapper.INSTANCE.toJson(so);
+        byte[] zip = ZipFunctions.SnappyZip.compress(data.getBytes());
+
+//        initRedisData(zip);
+
+        System.out.println("----------------------\n");
+        System.out.println("Snappy压缩 单个Key - set - byte");
+        doLoop(10, 100_000, (jedis) -> {
+            SimpleObject simpleObject = new SimpleObject();
+            String json = JsonMapper.INSTANCE.toJson(simpleObject);
+            byte[] compress = ZipFunctions.SnappyZip.compress(json.getBytes());
+
+            String[] key = randomKey(1);
+            jedis.set(key[0].getBytes(), compress);
+            return null;
+        });
+
+        System.out.println("----------------------\r\n");
+        System.out.println("Snappy压缩 单个Key - get - Byte");
+        doLoop(10, 100_000, (jedis) -> {
+            String[] key = randomKey(1);
+            byte[] bytes = jedis.get(key[0].getBytes());
+            byte[] uncompress = ZipFunctions.SnappyZip.uncompress(bytes);
+            try {
+                JsonMapper.INSTANCE.getMapper().readValue(uncompress, SimpleObject.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
+    }
+
+
+    private void initRedisData() {
+        String[] keyAndVal = genKeyAndVal(100_000);
+        try (Jedis jedis = pool.getResource()) {
+
+            for (int i = 0; i < 100_000; i++) {
+                jedis.set(keyAndVal[2 * i], keyAndVal[2 * i + 1]);
+
+            }
+        }
+    }
+
+    private void initRedisData(String json) {
+        String[] keyAndVal = genKeyAndVal(100_000);
+        try (Jedis jedis = pool.getResource()) {
+
+            for (int i = 0; i < 100_000; i++) {
+                jedis.set(keyAndVal[2 * i], json);
+
+            }
+        }
+    }
+
+    private void initRedisData(byte[] val) {
+        String[] keyAndVal = genKeyAndVal(100_000);
+        try (Jedis jedis = pool.getResource()) {
+
+            for (int i = 0; i < 100_000; i++) {
+                jedis.set(keyAndVal[2 * i].getBytes(), val);
+
+            }
+        }
     }
 
 
