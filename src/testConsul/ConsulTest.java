@@ -39,10 +39,10 @@ public class ConsulTest {
         ConsulTest consulTest = new ConsulTest();
         consulTest.removeAllCriticalService();
 //        System.out.println(QueryParams.DEFAULT);
-//        Response<List<CatalogService>> catalogService = consulClient.getCatalogService("my-service", QueryParams.DEFAULT);
+//        BaseResponse<List<CatalogService>> catalogService = consulClient.getCatalogService("my-service", QueryParams.DEFAULT);
 //        System.out.println(catalogService);
 //        QueryParams queryParams = new QueryParams(50000,60);
-//        Response<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
+//        BaseResponse<List<Check>> healthChecksState = consulClient.getHealthChecksState(Check.CheckStatus.CRITICAL, queryParams);
 //        System.out.println(JsonMapper.defaultMapper().toPrettyJson(healthChecksState));
 
 //        consulTest.registerNodeService();

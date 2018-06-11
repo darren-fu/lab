@@ -59,6 +59,7 @@ public class JsonMapper {
 //        mapper.registerModule(javaTimeModule);
         // 设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
     }
 
     /**

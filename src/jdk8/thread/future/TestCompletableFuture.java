@@ -74,6 +74,28 @@ public class TestCompletableFuture {
     }
 
     @Test
+    public void testCompleteMultiAction() {
+
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("run..." + "-" + Thread.currentThread().getName());
+
+            return "DOWN";
+        }).whenComplete((res, ex) -> {
+            System.out.println("complete:" + res + "-" + Thread.currentThread().getName());
+        });
+
+        future.whenComplete((res, ex) -> {
+            System.out.println("res2:" + res + "-" + Thread.currentThread().getName());
+
+            System.out.println(ex.getMessage());
+        });
+
+        future.join();
+
+    }
+
+
+    @Test
     public void testCompleteWithObject() {
         TestObject testObject = new TestObject();
         testObject.before();

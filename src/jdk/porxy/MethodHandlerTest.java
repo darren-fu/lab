@@ -38,6 +38,7 @@ public class MethodHandlerTest {
             System.out.println("dynamic proxy");
             System.out.println(handleMap.get(method) == null);
             handleMap.get(method).invoke(args);
+            handleMap.get(method).invokeWithArguments(args);
             return new String("123");
         }
     }
@@ -69,16 +70,14 @@ public class MethodHandlerTest {
         }
 
 
-
-
         DynaProxy proxyHandler = new DynaProxy(handleMap);
 
         DynamicProxyTest.IHello hello = (DynamicProxyTest.IHello) Proxy.newProxyInstance(
                 DynamicProxyTest.IHello.class.getClassLoader(),
                 new Class[]{DynamicProxyTest.IHello.class},
                 proxyHandler);
-        String str = hello.sayHello();
-        System.out.println(str);
+//        String str = hello.sayHello("dsad");
+//        System.out.println(str);
     }
 
 }

@@ -6,6 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import util.vo.BaseResponse;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -49,6 +50,10 @@ public class TesCaffinetCache {
     //创建value
     private static String createValue(String key) throws InterruptedException {
         Thread.sleep(1000L);//让当前线程sleep 1秒，是为了测试load和reload时候的并发特性
+
+
+        Cache<String, BaseResponse> build = CacheBuilder.newBuilder().build();
+
         return String.valueOf(value++);
     }
 
