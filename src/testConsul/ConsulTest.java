@@ -28,6 +28,7 @@ public class ConsulTest {
 
     static {
         String host = "192.168.1.248";
+//        String host = "169.44.201.253";
 //        String host = "localhost";
         int port = 8500;
 

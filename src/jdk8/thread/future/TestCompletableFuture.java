@@ -4,10 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,6 +69,38 @@ public class TestCompletableFuture {
         }
 
     }
+
+    @Test
+    public void testConcurrentAction() {
+        Runnable runnable = () -> {
+            try {
+                System.out.println(Thread.currentThread().getName() + " ---> START");
+                Thread.sleep(1_000L);
+                System.out.println(Thread.currentThread().getName() + " =====> END");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(runnable, service);
+        CompletableFuture<Void> future2 = CompletableFuture.runAsync(runnable, service);
+        CompletableFuture<Void> future3 = CompletableFuture.runAsync(() -> {
+            try {
+                Thread.sleep(3_000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("1".substring(0, 19));
+        }, service);
+        CompletableFuture<Void> future4 = CompletableFuture.runAsync(runnable, service);
+        CompletableFuture.allOf(future1, future2, future3, future4).exceptionally((e) -> {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }).join();
+        System.out.println("全部执行完成");
+
+    }
+
 
     @Test
     public void testCompleteMultiAction() {

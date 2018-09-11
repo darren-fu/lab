@@ -1,289 +1,293 @@
 !!testYml.TestYml$BetterTaskConfig
 autoRefresh: true
-configPath: http://50.23.190.55:8088/fuliang/task-monitor/raw/prod/src/main/resources/config/monitor-task-better.yaml
+configPath: config/monitor-task-better.yaml
 tasks:
-- executeNeedSeconds: 3554
+- executeNeedSeconds: 2903
   name: emarsys推荐de语种
   siteId: '7'
-  successExecuteCount: 823
-- executeNeedSeconds: 490
+  successExecuteCount: 1081
+- executeNeedSeconds: 539
   name: 删除推送日志时间
   siteId: '7'
-  successExecuteCount: 229
-- executeNeedSeconds: 229
+  successExecuteCount: 281
+- executeNeedSeconds: 274
   name: 同步库存脚本
   siteId: '10'
-  successExecuteCount: 22589
+  successExecuteCount: 30034
 - executeNeedSeconds: 0
   name: 大数据丢单检测
   siteId: '7'
-  successExecuteCount: 4610
-- executeNeedSeconds: 297
+  successExecuteCount: 5860
+- executeNeedSeconds: 285
   name: 亚马逊商品同步上下架
   siteId: '7'
-  successExecuteCount: 2726
+  successExecuteCount: 3399
 - executeNeedSeconds: 1
   name: 虚拟分类同步昨天上架的产品
   siteId: '10'
-  successExecuteCount: 168
+  successExecuteCount: 220
 - executeNeedSeconds: 0
   name: 大数据丢单检测
   siteId: '9'
-  successExecuteCount: 5454
+  successExecuteCount: 6701
 - executeNeedSeconds: 0
   name: 拆分商品失败补救
   siteId: '9'
-  successExecuteCount: 9341
+  successExecuteCount: 11838
 - executeNeedSeconds: 0
   name: 拆分商品失败补救
   siteId: '7'
-  successExecuteCount: 9354
-- executeNeedSeconds: 81
-  name: 同步虚拟库存脚本
-  siteId: '9'
-  successExecuteCount: 23386
-- executeNeedSeconds: 395
+  successExecuteCount: 11857
+- executeNeedSeconds: 1694
   name: emarsys推荐导出
   siteId: '7'
-  successExecuteCount: 828
-- executeNeedSeconds: 155
+  successExecuteCount: 1085
+- executeNeedSeconds: 1706
   name: emarsys推荐导出
   siteId: '9'
-  successExecuteCount: 720
-- executeNeedSeconds: 358
-  name: 同步真实库存脚本
-  siteId: '7'
-  successExecuteCount: 15327
-- executeNeedSeconds: 13
+  successExecuteCount: 983
+- executeNeedSeconds: 28
   name: 自动上下架脚本
   siteId: '9'
-  successExecuteCount: 232
+  successExecuteCount: 283
 - executeNeedSeconds: 0
   name: 大数据丢单检测
   siteId: '11'
-  successExecuteCount: 5437
+  successExecuteCount: 6683
 - executeNeedSeconds: 0
   name: 拆分商品失败补救
   siteId: '11'
-  successExecuteCount: 9354
+  successExecuteCount: 11849
+- executeNeedSeconds: 41
+  name: admitad推荐en语种
+  siteId: '9'
+  successExecuteCount: 42
 - executeNeedSeconds: 0
   name: 大数据丢单检测
   siteId: '10'
-  successExecuteCount: 5438
+  successExecuteCount: 6692
 - executeNeedSeconds: 0
   name: 拆分商品失败补救
   siteId: '10'
-  successExecuteCount: 9343
+  successExecuteCount: 11833
 - executeNeedSeconds: 0
   name: 刷新akamai
   siteId: '7'
-  successExecuteCount: 65492
-- executeNeedSeconds: 3
+  successExecuteCount: 80422
+- executeNeedSeconds: 7
   name: romwe抓单监控
   siteId: '9'
-  successExecuteCount: 17958
+  successExecuteCount: 25407
 - executeNeedSeconds: 0
   name: 更新zendesk数据
   siteId: '10'
-  successExecuteCount: 15354
+  successExecuteCount: 22809
 - executeNeedSeconds: 2
   name: 预刷商品中心属性信息数据
   siteId: '7'
-  successExecuteCount: 673
+  successExecuteCount: 1916
 - executeNeedSeconds: 0
   name: mmc抓单监控
   siteId: '10'
-  successExecuteCount: 18097
+  successExecuteCount: 25554
 - executeNeedSeconds: 0
   name: 系统自动关闭回复
   siteId: '11'
-  successExecuteCount: 229
-- executeNeedSeconds: 5
+  successExecuteCount: 281
+- executeNeedSeconds: 2
   name: 系统自动关闭回复
   siteId: '10'
-  successExecuteCount: 229
-- executeNeedSeconds: 75
+  successExecuteCount: 281
+- executeNeedSeconds: 62
   name: 系统自动关闭回复
   siteId: '7'
-  successExecuteCount: 229
-- executeNeedSeconds: 119
+  successExecuteCount: 281
+- executeNeedSeconds: 95
   name: 系统自动关闭回复
   siteId: '9'
-  successExecuteCount: 229
+  successExecuteCount: 281
 - executeNeedSeconds: 0
   name: rs_goods表on_sale_status脚本
   siteId: '9'
-  successExecuteCount: 65487
-- executeNeedSeconds: 7105
+  successExecuteCount: 80411
+- executeNeedSeconds: 5798
   name: goods_analysis向goods表更新
   siteId: '10'
-  successExecuteCount: 231
+  successExecuteCount: 283
 - executeNeedSeconds: 0
   name: rs_goods表on_sale_status脚本
   siteId: '7'
-  successExecuteCount: 65489
-- executeNeedSeconds: 10
+  successExecuteCount: 80389
+- executeNeedSeconds: 11
   name: 推送产品排序权重之一
   siteId: '10'
-  successExecuteCount: 229
+  successExecuteCount: 277
 - executeNeedSeconds: 0
   name: taskmanager
   siteId: '0'
-  successExecuteCount: 2485820
+  successExecuteCount: 3027013
 - executeNeedSeconds: 300
   name: 速卖通同步脚本
   siteId: '7'
-  successExecuteCount: 229
+  successExecuteCount: 281
 - executeNeedSeconds: 0
   name: emc抓单监控
   siteId: '11'
-  successExecuteCount: 18092
-- executeNeedSeconds: 156
+  successExecuteCount: 25538
+- executeNeedSeconds: 206
+  name: 收款对账系统获取积分交易明细数据
+  siteId: '7'
+  successExecuteCount: 741
+- executeNeedSeconds: 125
   name: 联盟用户佣金月结计算
   siteId: '9'
-  successExecuteCount: 8
-- executeNeedSeconds: 834
+  successExecuteCount: 10
+- executeNeedSeconds: 41
+  name: admitad推荐de语种
+  siteId: '9'
+  successExecuteCount: 42
+- executeNeedSeconds: 25
+  name: 收款对账系统获取积分交易明细数据
+  siteId: '9'
+  successExecuteCount: 748
+- executeNeedSeconds: 59
+  name: 供应商绑定平台-供应商白名单，SKU黑名单自动同步脚本
+  siteId: '0'
+  successExecuteCount: 45
+- executeNeedSeconds: 1387
   name: emarsys推荐fr语种
   siteId: '9'
-  successExecuteCount: 18
+  successExecuteCount: 443
 - executeNeedSeconds: 253
   name: 更新用于搜索的产品属性
   siteId: '9'
-  successExecuteCount: 229
-- executeNeedSeconds: 183
+  successExecuteCount: 280
+- executeNeedSeconds: 166
   name: 更新用于搜索的产品属性
   siteId: '7'
-  successExecuteCount: 229
-- executeNeedSeconds: 29
-  name: 监控风控放行订单同步商城
-  siteId: '0'
-  successExecuteCount: 7425
+  successExecuteCount: 280
 - executeNeedSeconds: 0
   name: 自动上架脚本
   siteId: '7'
-  successExecuteCount: 5845
-- executeNeedSeconds: 926
+  successExecuteCount: 8708
+- executeNeedSeconds: 1081
   name: emarsys推荐us语种
   siteId: '9'
-  successExecuteCount: 16
-- executeNeedSeconds: 28
-  name: 监控风控退款订单同步商城
-  siteId: '0'
-  successExecuteCount: 7424
-- executeNeedSeconds: 551
+  successExecuteCount: 280
+- executeNeedSeconds: 1238
   name: emarsys推荐导出us语
   siteId: '7'
-  successExecuteCount: 16
-- executeNeedSeconds: 394
+  successExecuteCount: 420
+- executeNeedSeconds: 1256
   name: emarsys推荐fr语种
   siteId: '7'
-  successExecuteCount: 819
+  successExecuteCount: 1075
 - executeNeedSeconds: 0
   name: 自动上架脚本
   siteId: '9'
-  successExecuteCount: 5808
-- executeNeedSeconds: 6
+  successExecuteCount: 8677
+- executeNeedSeconds: 4
   name: 商品中心标签规则定时任务
   siteId: '0'
-  successExecuteCount: 163
-- executeNeedSeconds: 127
+  successExecuteCount: 475
+- executeNeedSeconds: 114
   name: 联盟用户佣金月结计算
   siteId: '7'
-  successExecuteCount: 14
-- executeNeedSeconds: 379
+  successExecuteCount: 16
+- executeNeedSeconds: 376
   name: 删除购物车记录
   siteId: '7'
-  successExecuteCount: 2259
-- executeNeedSeconds: 399
+  successExecuteCount: 2776
+- executeNeedSeconds: 1693
   name: emarsys推荐es语种
   siteId: '7'
-  successExecuteCount: 820
-- executeNeedSeconds: 0
+  successExecuteCount: 1079
+- executeNeedSeconds: 1715
   name: 商品中心推送脚本
   siteId: '0'
-  successExecuteCount: 305409
-- executeNeedSeconds: 81
+  successExecuteCount: 379810
+- executeNeedSeconds: 80
   name: 删除购物车记录
   siteId: '9'
-  successExecuteCount: 2262
+  successExecuteCount: 2782
 - executeNeedSeconds: 0
   name: 自动上架脚本
   siteId: '11'
-  successExecuteCount: 5808
+  successExecuteCount: 8676
 - executeNeedSeconds: 0
   name: 自动上架脚本
   siteId: '10'
-  successExecuteCount: 5809
-- executeNeedSeconds: 126
+  successExecuteCount: 8676
+- executeNeedSeconds: 101
   name: goods_analysis向goods表更新
   siteId: '7'
-  successExecuteCount: 227
-- executeNeedSeconds: 18
+  successExecuteCount: 279
+- executeNeedSeconds: 24
   name: 虚拟分类删除有效期外的产品
   siteId: '9'
-  successExecuteCount: 33
+  successExecuteCount: 87
 - executeNeedSeconds: 0
   name: goods_analysis向goods表更新
   siteId: '9'
-  successExecuteCount: 223
+  successExecuteCount: 275
 - executeNeedSeconds: 0
   name: rs_goods表on_sale_status脚本
   siteId: '11'
-  successExecuteCount: 65486
-- executeNeedSeconds: 14
+  successExecuteCount: 80414
+- executeNeedSeconds: 68
   name: 虚拟分类删除有效期外的产品
   siteId: '7'
-  successExecuteCount: 33
-- executeNeedSeconds: 55
+  successExecuteCount: 85
+- executeNeedSeconds: 105
   name: 虚拟分类同步昨天上架的产品
   siteId: '7'
-  successExecuteCount: 236
+  successExecuteCount: 287
 - executeNeedSeconds: 1
   name: rs_goods表on_sale_status脚本
   siteId: '10'
-  successExecuteCount: 10923
-- executeNeedSeconds: 0
+  successExecuteCount: 13411
+- executeNeedSeconds: 6
   name: shein抓单监控
   siteId: '7'
-  successExecuteCount: 18098
-- executeNeedSeconds: 15
+  successExecuteCount: 25560
+- executeNeedSeconds: 29
   name: 虚拟分类同步昨天上架的产品
   siteId: '9'
-  successExecuteCount: 165
-- executeNeedSeconds: 425
+  successExecuteCount: 218
+- executeNeedSeconds: 889
   name: certona推荐us
   siteId: '7'
-  successExecuteCount: 15
+  successExecuteCount: 78
 - executeNeedSeconds: 80
   name: 删除购物车记录
   siteId: '11'
-  successExecuteCount: 2261
+  successExecuteCount: 2781
 - executeNeedSeconds: 80
   name: 删除购物车记录
   siteId: '10'
-  successExecuteCount: 2267
+  successExecuteCount: 2787
 - executeNeedSeconds: 0
   name: 更新zendesk数据
   siteId: '9'
-  successExecuteCount: 15342
+  successExecuteCount: 22803
 - executeNeedSeconds: 1
   name: 更新zendesk数据
   siteId: '7'
-  successExecuteCount: 23970
-- executeNeedSeconds: 21
+  successExecuteCount: 31419
+- executeNeedSeconds: 25
   name: 推送产品排序权重之一
   siteId: '9'
-  successExecuteCount: 228
-- executeNeedSeconds: 9
+  successExecuteCount: 276
+- executeNeedSeconds: 2
   name: 虚拟分类删除有效期外的产品
   siteId: '10'
-  successExecuteCount: 33
-- executeNeedSeconds: 39
+  successExecuteCount: 86
+- executeNeedSeconds: 40
   name: 推送产品排序权重之一
   siteId: '7'
-  successExecuteCount: 163
-- executeNeedSeconds: 9
+  successExecuteCount: 215
+- executeNeedSeconds: 2
   name: 虚拟分类删除有效期外的产品
   siteId: '11'
-  successExecuteCount: 33
-version: 2.0
+  successExecuteCount: 86
+version: 2.3

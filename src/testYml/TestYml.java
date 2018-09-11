@@ -28,12 +28,12 @@ public class TestYml {
         DumperOptions dumperOptions = new DumperOptions();
         dumperOptions.setPrettyFlow(true);
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        dumperOptions.setTags(tag);
+//        dumperOptions.setTags(tag);
         Yaml yaml = new Yaml(dumperOptions);
 
         ObjectMapper mapper = new ObjectMapper();
-//        BetterTaskConfig betterTaskConfig = mapper.readValue(JsonStr.json.getBytes(), BetterTaskConfig.class);
-        BetterTaskConfig betterTaskConfig = new BetterTaskConfig();
+        BetterTaskConfig betterTaskConfig = mapper.readValue(JsonStr.json.getBytes(), BetterTaskConfig.class);
+//        BetterTaskConfig betterTaskConfig = new BetterTaskConfig();
 
         System.out.println(betterTaskConfig);
         String local = System.getProperty("user.dir");

@@ -2,11 +2,7 @@ package testCache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import util.vo.BaseResponse;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -25,34 +21,18 @@ public class TesCaffinetCache {
     private static final int CONCURRENT_NUM = 10;//并发数
 
     private volatile static int value = 1;
+//    private static Cache<String, String> cache = Caffeine.newBuilder().maximumSize(1000)
 
-    //    private static LoadingCache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000)
-    private static Cache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000)
+    private static Cache<Object, Object> cache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
             .expireAfterWrite(5, TimeUnit.SECONDS)
-//            .refreshAfterWrite(1, TimeUnit.SECONDS)
             .build();
-//            .build(new CacheLoader<String, String>() {
-//                       public String load(String key) throws InterruptedException {
-//                           System.out.println("load by " + Thread.currentThread().getName());
-//                           return createValue(key);
-//                       }
-//
-//
-//                       @Override
-//                       public ListenableFuture<String> reload(String key, String oldValue)
-//                               throws Exception {
-//                           System.out.println("reload by " + Thread.currentThread().getName());
-//                           return Futures.immediateFuture(createValue(key));
-//                       }
-//                   }
-//            );
 
     //创建value
     private static String createValue(String key) throws InterruptedException {
         Thread.sleep(1000L);//让当前线程sleep 1秒，是为了测试load和reload时候的并发特性
 
-
-        Cache<String, BaseResponse> build = CacheBuilder.newBuilder().build();
+        cache.cleanUp();
 
         return String.valueOf(value++);
     }

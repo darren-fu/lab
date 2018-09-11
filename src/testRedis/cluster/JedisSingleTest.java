@@ -25,9 +25,10 @@ public class JedisSingleTest {
     static JedisPoolConfig poolConfig = new JedisPoolConfig();
 
     {
-        poolConfig.setMaxTotal(100);
-        poolConfig.setMinIdle(5);
-        poolConfig.setMaxIdle(20);
+        poolConfig.setMaxTotal(1);
+        poolConfig.setMinIdle(0);
+        poolConfig.setMaxIdle(1);
+        poolConfig.setTestWhileIdle(false);
     }
 
     static JedisPool pool;
@@ -36,6 +37,25 @@ public class JedisSingleTest {
     public static void init() {
         pool = new JedisPool(poolConfig, "localhost", 6379);
     }
+
+
+
+
+    @Test
+    public void testTimeout() throws InterruptedException {
+
+        Jedis jedis = pool.getResource();
+
+        jedis.set("test11111", "val11111");
+        jedis.close();
+        Thread.sleep(10_000);
+        Jedis jedis2 = pool.getResource();
+        System.out.println(jedis2 == jedis);
+        String test11111 = jedis2.set("test11111","1111");
+        System.out.println(test11111);
+
+    }
+
 
 
     @Test
@@ -75,6 +95,7 @@ public class JedisSingleTest {
     @Test
     public void testMget1() {
         try (Jedis jedis = pool.getResource()) {
+            jedis.set("test111", "val111", "", "EX", 100);
 
             int nextInt = RandomUtils.nextInt(0, 100_000 - 500);
             String[] keyArr = getKey(nextInt, 2);
@@ -112,7 +133,6 @@ public class JedisSingleTest {
     @Test
     public void testSingleKeyget() {
         try (Jedis jedis = pool.getResource()) {
-
             for (int z = 0; z < 10; z++) {
                 long start = System.currentTimeMillis();
                 int times = 100_000;

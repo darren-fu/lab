@@ -145,6 +145,24 @@ public class RedisClusterTest {
             jedisCluster.set(keyAndVal[i * 2], keyAndVal[i * 2 + 1]);
         }
     }
+    @Test
+    public void testSlot() {
+
+        System.out.println(JedisClusterCRC16.getSlot("12"));
+        System.out.println(JedisClusterCRC16.getSlot("0"));
+        System.out.println(JedisClusterCRC16.getSlot("00"));
+        System.out.println(JedisClusterCRC16.getSlot("000"));
+        System.out.println(JedisClusterCRC16.getSlot("17682"));
+
+
+        for (int i = 0; i < 50000; i++) {
+            int slot = JedisClusterCRC16.getSlot(String.valueOf(i));
+            if(slot == JedisClusterCRC16.getSlot("0")){
+                System.out.println(i);
+            }
+
+        }
+    }
 
     @Test
     public void testMset() {

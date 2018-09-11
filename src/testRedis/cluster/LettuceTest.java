@@ -50,6 +50,7 @@ public class LettuceTest {
     @Test
     public void testSingleRedisSingleKey() throws ExecutionException, InterruptedException {
         StatefulRedisConnection<String, String> connect = redisClient.connect();
+
         for (int z = 0; z < 10; z++) {
 
             long start = System.currentTimeMillis();
